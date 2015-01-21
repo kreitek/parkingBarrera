@@ -60,33 +60,33 @@ void loop() {
 
   switch(estado) {
     case BAJADA: 
-        digitalWrite(R1, LOW);
-        digitalWrite(R2, LOW);
+        digitalWrite(pinR1, LOW);
+        digitalWrite(pinR2, LOW);
         if (digitalRead(pinBtn_S) == DISPARADO)
           estado = SUBIENDO;
         break;
     case SUBIENDO:
-        digitalWrite(R1, HIGH);
-        digitalWrite(R2, LOW);
+        digitalWrite(pinR1, HIGH);
+        digitalWrite(pinR2, LOW);
         if (digitalRead(pinFin_S) == DISPARADO || tiempoS)
           estado = SUBIDA;
         break;
     case SUBIDA: 
-        digitalWrite(pinR1 = LOW);
-        digitalWrite(pinR2 = LOW);
+        digitalWrite(pinR1, LOW);
+        digitalWrite(pinR2, LOW);
         if (digitalRead(pinBtn_B) == DISPARADO && \
             !digitalRead(pinFoto_1) == DISPARADO && \
             !digitalRead(pinFoto_2) == DISPARADO)
           estado = BAJANDO;
         break;
     case BAJANDO:
-        digitalWrite(pinR1 = LOW);
-        digitalWrite(pinR2 = HIGH);
+        digitalWrite(pinR1, LOW);
+        digitalWrite(pinR2, HIGH);
         if (digitalRead(pinFoto_1 == DISPARADO) || \
             digitalRead(pinFoto_2 == DISPARADO) || \
             digitalRead(pinBtn_S == DISPARADO))
           estado = SUBIENDO;
-        if (digitalRead(pinFin_B == DISPARADO || tiempoB)
+        if (digitalRead(pinFin_B == DISPARADO || tiempoB))
           estado = BAJADA;
         break;
   }
@@ -99,7 +99,7 @@ void serialCmd() {
   while(Serial.available() > 0) {
     switch (Serial.read()) {
       case '\n':
-          Serial.print('[.]\n') 
+          Serial.print('[.]\n');
           break;
       default:
           // Nada
