@@ -5,7 +5,12 @@ del Anden Sin Limite */
 
 #include <SoftwareSerial.h>
 
-#define DISPARADO HIGH
+#define DISPARADO_FINCARRERA HIGH
+#define DISPARADO LOW
+#define INPUTMODE INPUT_PULLUP
+
+#define MHIGH LOW
+#define MLOW HIGH
 
 int pinBtn_S = 2;
 int pinBtn_B = 3;
@@ -13,11 +18,12 @@ int pinFoto_1 = 4;
 int pinFoto_2 = 5;
 int pinFin_B = 6;
 int pinFin_S = 7;
-int pinExt_B = 8;
-int pinExt_S = 9;
 
-int pinR1 = 12;
-int pinR2 = 13;
+int pinR2 = 8;
+int pinR1 = 9;
+
+int pinExt_B = 10;
+int pinExt_S = 11;
 
 // Pines NewSoftwareSerial
 int pinRX = 10;
@@ -26,7 +32,7 @@ int pinTX = 11;
 SoftwareSerial mySerial(pinRX, pinTX); // RX, TX
 
 // VAriables de la Maquina de estados
-int estado;  
+int estado, estadoOld;  
 
 #define BAJADA 0
 #define SUBIENDO 1
@@ -37,14 +43,19 @@ boolean tiempoS;
 boolean tiempoB;
 
 void setup () {
-  pinMode(pinBtn_S, INPUT);
-  pinMode(pinBtn_B, INPUT);
-  pinMode(pinFoto_1, INPUT);
-  pinMode(pinFoto_2, INPUT);
-  pinMode(pinFin_B, INPUT);
-  pinMode(pinFin_S, INPUT);
-  pinMode(pinExt_B, INPUT);
-  pinMode(pinExt_S, INPUT);
+  pinMode(pinBtn_S, INPUTMODE);
+  pinMode(pinBtn_B, INPUTMODE);
+  pinMode(pinFoto_1, INPUTMODE);
+  pinMode(pinFoto_2, INPUTMODE);
+  pinMode(pinFin_B, INPUTMODE);
+  pinMode(pinFin_S, INPUTMODE);
+  pinMode(pinExt_B, INPUTMODE);
+  pinMode(pinExt_S, INPUTMODE);
+  
+  pinMode(pinR1, OUTPUT);
+  pinMode(pinR2, OUTPUT);
+  digitalWrite(pinR1, HIGH);
+  digitalWrite(pinR2, HIGH);
 
   mySerial.begin(57600);
   Serial.begin(9600);
@@ -55,38 +66,43 @@ void setup () {
   tiempoB = false;
 }
 
-
 void loop() {
 
+  if (estado != estadoOld) {
+    Serial.print("estado= ");
+    Serial.println(estado);
+    estadoOld = estado;
+  }
+  
   switch(estado) {
     case BAJADA: 
-        digitalWrite(pinR1, LOW);
-        digitalWrite(pinR2, LOW);
+        digitalWrite(pinR1, MLOW);
+        digitalWrite(pinR2, MLOW);
         if (digitalRead(pinBtn_S) == DISPARADO)
           estado = SUBIENDO;
         break;
     case SUBIENDO:
-        digitalWrite(pinR1, HIGH);
-        digitalWrite(pinR2, LOW);
-        if (digitalRead(pinFin_S) == DISPARADO || tiempoS)
+        digitalWrite(pinR1, MHIGH);
+        digitalWrite(pinR2, MLOW);
+        if (digitalRead(pinFin_S) == DISPARADO_FINCARRERA || tiempoS)
           estado = SUBIDA;
         break;
     case SUBIDA: 
-        digitalWrite(pinR1, LOW);
-        digitalWrite(pinR2, LOW);
+        digitalWrite(pinR1, MLOW);
+        digitalWrite(pinR2, MLOW);
         if (digitalRead(pinBtn_B) == DISPARADO && \
             !digitalRead(pinFoto_1) == DISPARADO && \
             !digitalRead(pinFoto_2) == DISPARADO)
           estado = BAJANDO;
         break;
     case BAJANDO:
-        digitalWrite(pinR1, LOW);
-        digitalWrite(pinR2, HIGH);
-        if (digitalRead(pinFoto_1 == DISPARADO) || \
-            digitalRead(pinFoto_2 == DISPARADO) || \
-            digitalRead(pinBtn_S == DISPARADO))
+        digitalWrite(pinR1, MLOW);
+        digitalWrite(pinR2, MHIGH);
+        if (digitalRead(pinFoto_1) == DISPARADO || \
+            digitalRead(pinFoto_2) == DISPARADO || \
+            digitalRead(pinBtn_S) == DISPARADO)
           estado = SUBIENDO;
-        if (digitalRead(pinFin_B == DISPARADO || tiempoB))
+        if (digitalRead(pinFin_B) == DISPARADO_FINCARRERA || tiempoB)
           estado = BAJADA;
         break;
   }
@@ -98,8 +114,11 @@ void serialCmd() {
 
   while(Serial.available() > 0) {
     switch (Serial.read()) {
-      case '\n':
-          Serial.print('[.]\n');
+      case 'I':  // print inputs
+          printInputs();
+          break;
+      case 'E':  // echo
+          Serial.print("[OK]\n");
           break;
       default:
           // Nada
@@ -108,4 +127,23 @@ void serialCmd() {
   }
 }	
 
+void printInputs() {
+  printInput(pinBtn_S, DISPARADO);
+  printInput(pinBtn_B, DISPARADO);
+  printInput(pinFoto_1, DISPARADO);
+  printInput(pinFoto_2, DISPARADO);
+  printInput(pinFin_B, DISPARADO_FINCARRERA);
+  printInput(pinFin_S, DISPARADO_FINCARRERA);
+  printInput(pinExt_B, DISPARADO);
+  printInput(pinExt_S, DISPARADO);
+  Serial.println();
+}
 
+void printInput(int pinX, int d) {
+  Serial.print("Input ");
+  Serial.print(pinX);
+  Serial.print(" : ");
+  int v = digitalRead(pinX);
+  if (v == d) Serial.println("PULSADO");
+  else Serial.println("-------");
+}
