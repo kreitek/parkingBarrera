@@ -113,7 +113,7 @@ void loop()
         crono_diferencia = millis() - crono_comienzo_subida;
         if (digitalRead(pinFin_S) == DISPARADO_FINCARRERA) {
             if (crono_subida == 99999)
-                crono_subida = crono_diferencia * 90 / 100;
+                crono_subida = crono_diferencia * 95 / 100;
         } 
         if (digitalRead(pinFin_S) == DISPARADO_FINCARRERA || crono_diferencia > crono_subida) {
             estado = SUBIDA;
