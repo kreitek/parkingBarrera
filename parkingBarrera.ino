@@ -12,27 +12,28 @@ del Anden Sin Limite */
 #define MHIGH LOW
 #define MLOW HIGH
 
-int pinBtn_S = 2;
-int pinBtn_B = 3;
-int pinFoto_1 = 4;
-int pinFoto_2 = 5;
-int pinFin_B = 6;
-int pinFin_S = 7;
+#define pinBtn_S 2
+#define pinBtn_B 3
+#define pinFoto_1 4
+#define pinFoto_2 5
+#define pinFin_B 6
+#define pinFin_S 7
+#define pinR2 8
+#define pinR1 9
+#define pinExt_B 10
+#define pinExt_S 11
 
-int pinR2 = 8;
-int pinR1 = 9;
-
-int pinExt_B = 10;
-int pinExt_S = 11;
+char * PINES_STR[] = {"pin0", "pin1", "boton subir", "boton bajar", "fotocelula1", "fotocelula2",
+    "fincarrera subir", "fincarrera bajar", "rele2", "rele1", "externa bajar", "externa subir"};
 
 // Pines NewSoftwareSerial
-int pinRX = 10;
-int pinTX = 11;
+#define pinRX 10
+#define pinTX 11
 
 SoftwareSerial mySerial(pinRX, pinTX); // RX, TX
 
 // VAriables de la Maquina de estados
-int estado, estadoOld;  
+int estado;  
 
 #define BAJADA 0
 #define SUBIENDO 1
@@ -64,7 +65,13 @@ void setup () {
   mySerial.begin(57600);
   Serial.begin(9600);
  
-  estado = BAJADA;
+  if (digitalRead(pinFin_B) == DISPARADO_FINCARRERA && digitalRead(pinFin_S) != DISPARADO_FINCARRERA) {
+    estado = BAJADA;
+  } else if (digitalRead(pinFin_B) != DISPARADO_FINCARRERA && digitalRead(pinFin_S) == DISPARADO_FINCARRERA) {
+    estado = SUBIDA;
+  } else {
+    estado = SUBIENDO;
+  }
 
   tiempoS = false;
   tiempoB = false;
@@ -77,12 +84,6 @@ void loop() {
     presentaSerie = false;
   }
 
-  if (estado != estadoOld) {
-    Serial.print("estado= ");
-    Serial.println(estado);
-    estadoOld = estado;
-  }
-  
   switch(estado) {
     case BAJADA: 
         digitalWrite(pinR1, MLOW);
@@ -161,6 +162,11 @@ void printInputs() {
 void printInput(int pinX, int d) {
   Serial.print("Input ");
   Serial.print(pinX);
+  if (pinX>1 && pinX<sizeof(ESTADOS_STR)/sizeof(char*)) {
+      Serial.print(" ");
+      Serial.print(PINES_STR[pinX]);
+  }
+  
   Serial.print(" : ");
   int v = digitalRead(pinX);
   if (v == d)
