@@ -26,7 +26,7 @@ del Anden Sin Limite */
 char *PINES_STR[] =
     { "pin0", "pin1", "boton subir", "boton bajar", "fotocelula1",
     "fotocelula2",
-    "fincarrera subir", "fincarrera bajar", "rele2", "rele1",
+    "fincarrera bajada", "fincarrera subida", "rele2", "rele1",
     "externa bajar", "externa subir"
 };
 
@@ -48,10 +48,12 @@ unsigned long crono_comienzo_subida, crono_diferencia, crono_subida;
 
 char *ESTADOS_STR[] = { "bajada", "subiendo", "subida", "bajando" };
 
+#define CRONO_NULL 99999
 boolean tiempoS;
 boolean tiempoB;
 
 boolean presentaSerie;
+boolean interrumpida_bajada;
 
 void setup()
 {
@@ -72,6 +74,8 @@ void setup()
     mySerial.begin(57600);
     Serial.begin(9600);
 
+    // Establce el estado inicial en funcion de lo que
+    //  devuelvan los fines de carrera
     if (digitalRead(pinFin_B) == DISPARADO_FINCARRERA
         && digitalRead(pinFin_S) != DISPARADO_FINCARRERA) {
         estado = BAJADA;
@@ -87,7 +91,8 @@ void setup()
     presentaSerie = true;
     crono_comienzo_subida = 0;
     crono_diferencia = 0;
-    crono_subida = 99999;
+    crono_subida = CRONO_NULL;
+    interrumpida_bajada = false;
 }
 
 void loop()
@@ -112,19 +117,22 @@ void loop()
         digitalWrite(pinR2, MLOW);
         crono_diferencia = millis() - crono_comienzo_subida;
         if (digitalRead(pinFin_S) == DISPARADO_FINCARRERA) {
-            if (crono_subida == 99999)
+            if (crono_subida == CRONO_NULL)
                 crono_subida = crono_diferencia * 95 / 100;
         } 
-        if (digitalRead(pinFin_S) == DISPARADO_FINCARRERA || crono_diferencia > crono_subida) {
+        if (digitalRead(pinFin_S) == DISPARADO_FINCARRERA || (crono_diferencia > crono_subida 
+              && !interrumpida_bajada)) {
             estado = SUBIDA;
             presentaSerie = true;
-            Serial.print("diferencia=");
-            Serial.println(crono_diferencia);
+            Serial.print("tiempo_de_subida= ");
+            Serial.print(crono_diferencia);
+            Serial.println("ms");
         }
         break;
     case SUBIDA:
         digitalWrite(pinR1, MLOW);
         digitalWrite(pinR2, MLOW);
+        interrumpida_bajada = false;
         if (digitalRead(pinBtn_B) == DISPARADO &&
             !digitalRead(pinFoto_1) == DISPARADO &&
             !digitalRead(pinFoto_2) == DISPARADO) {
@@ -139,7 +147,7 @@ void loop()
             digitalRead(pinFoto_2) == DISPARADO ||
             digitalRead(pinBtn_S) == DISPARADO) {
             estado = SUBIENDO;
-            crono_comienzo_subida = millis();
+            interrumpida_bajada = true;
         }
         if (digitalRead(pinFin_B) == DISPARADO_FINCARRERA || tiempoB) {
             estado = BAJADA;
@@ -188,7 +196,7 @@ void printInput(int pinX, int d)
 {
     Serial.print("Input ");
     Serial.print(pinX);
-    if (pinX > 1 && pinX < sizeof(ESTADOS_STR) / sizeof(char *)) {
+    if (pinX > 1 && pinX < sizeof(PINES_STR) / sizeof(char *)) {
         Serial.print(" ");
         Serial.print(PINES_STR[pinX]);
     }
