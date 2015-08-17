@@ -106,7 +106,8 @@ void loop()
     case BAJADA:
         digitalWrite(pinR1, MLOW);
         digitalWrite(pinR2, MLOW);
-        if (digitalRead(pinBtn_S) == DISPARADO) {
+        if (digitalRead(pinBtn_S) == DISPARADO ||
+            digitalRead(pinExt_S) == DISPARADO) {
             estado = SUBIENDO;
             crono_comienzo_subida = millis();
             presentaSerie = true;
@@ -133,7 +134,8 @@ void loop()
         digitalWrite(pinR1, MLOW);
         digitalWrite(pinR2, MLOW);
         interrumpida_bajada = false;
-        if (digitalRead(pinBtn_B) == DISPARADO &&
+        if ((digitalRead(pinBtn_B) == DISPARADO || 
+            digitalRead(pinExt_B) == DISPARADO) &&
             !digitalRead(pinFoto_1) == DISPARADO &&
             !digitalRead(pinFoto_2) == DISPARADO) {
             estado = BAJANDO;
