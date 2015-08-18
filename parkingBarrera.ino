@@ -38,6 +38,8 @@ SoftwareSerial mySerial(pinRX, pinTX);  // RX, TX
 
 // VAriables de la Maquina de estados
 int estado;
+int sig_ext_sube;
+int sig_ext_baja;
 
 unsigned long crono_comienzo_subida, crono_diferencia, crono_subida;
 
@@ -45,6 +47,9 @@ unsigned long crono_comienzo_subida, crono_diferencia, crono_subida;
 #define SUBIENDO 1
 #define SUBIDA 2
 #define BAJANDO 3
+
+#define EXT_NULO 0
+#define EXT_DISP 1
 
 char *ESTADOS_STR[] = { "bajada", "subiendo", "subida", "bajando" };
 
@@ -86,6 +91,8 @@ void setup()
         estado = SUBIENDO;
     }
 
+    sig_ext_sube = EXT_NULO;
+    sig_ext_baja = EXT_NULO;
     tiempoS = false;
     tiempoB = false;
     presentaSerie = true;
@@ -106,8 +113,12 @@ void loop()
     case BAJADA:
         digitalWrite(pinR1, MLOW);
         digitalWrite(pinR2, MLOW);
+        if (sig_ext_baja)
+          sig_ext_baja = EXT_NULO;
+        if (digitalRead(pinExt_S) == DISPARADO)
+          sig_ext_sube = EXT_DISP;
         if (digitalRead(pinBtn_S) == DISPARADO ||
-            digitalRead(pinExt_S) == DISPARADO) {
+            sig_ext_sube == EXT_DISP) {
             estado = SUBIENDO;
             crono_comienzo_subida = millis();
             presentaSerie = true;
@@ -133,9 +144,14 @@ void loop()
     case SUBIDA:
         digitalWrite(pinR1, MLOW);
         digitalWrite(pinR2, MLOW);
+        
+        if (sig_ext_sube)
+          sig_ext_sube = EXT_NULO;
+        if (digitalRead(pinExt_B) == DISPARADO)
+          sig_ext_baja = EXT_DISP;
         interrumpida_bajada = false;
         if ((digitalRead(pinBtn_B) == DISPARADO || 
-            digitalRead(pinExt_B) == DISPARADO) &&
+            sig_ext_baja == EXT_DISP) &&
             !digitalRead(pinFoto_1) == DISPARADO &&
             !digitalRead(pinFoto_2) == DISPARADO) {
             estado = BAJANDO;
