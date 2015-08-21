@@ -42,6 +42,8 @@ int sig_ext_sube;
 int sig_ext_baja;
 
 unsigned long crono_comienzo_subida, crono_diferencia, crono_subida;
+unsigned long crono_timeout, crono_diferencia_timeout;
+unsigned long crono_coche, crono_diferencia_coche;
 
 #define BAJADA 0
 #define SUBIENDO 1
@@ -50,6 +52,10 @@ unsigned long crono_comienzo_subida, crono_diferencia, crono_subida;
 
 #define EXT_NULO 0
 #define EXT_DISP 1
+#define TIEMPO_MS_MINIMO_COCCHE 2000
+#define TIEMPO_MS_TIMEOUT 5000
+boolean coche_paso;
+boolean timeout;
 
 char *ESTADOS_STR[] = { "bajada", "subiendo", "subida", "bajando" };
 
@@ -93,12 +99,18 @@ void setup()
 
     sig_ext_sube = EXT_NULO;
     sig_ext_baja = EXT_NULO;
+    coche_paso = false;
+    timeout = false;
     tiempoS = false;
     tiempoB = false;
     presentaSerie = true;
     crono_comienzo_subida = 0;
     crono_diferencia = 0;
     crono_subida = CRONO_NULL;
+    crono_diferencia_coche = 0;
+    crono_coche = CRONO_NULL;
+    crono_diferencia_timeout = 0;
+    crono_timeout = CRONO_NULL;
     interrumpida_bajada = false;
 }
 
@@ -128,12 +140,14 @@ void loop()
         digitalWrite(pinR1, MHIGH);
         digitalWrite(pinR2, MLOW);
         crono_diferencia = millis() - crono_comienzo_subida;
+        if (digitalRead(pinExt_B) == DISPARADO)
+          sig_ext_baja = EXT_DISP;
         if (digitalRead(pinFin_S) == DISPARADO_FINCARRERA) {
             if (crono_subida == CRONO_NULL)
                 crono_subida = crono_diferencia * 95 / 100;
         } 
         if (digitalRead(pinFin_S) == DISPARADO_FINCARRERA || (crono_diferencia > crono_subida 
-              && !interrumpida_bajada)) {
+                && !interrumpida_bajada)) {
             estado = SUBIDA;
             presentaSerie = true;
             Serial.print("tiempo_de_subida= ");
@@ -149,11 +163,12 @@ void loop()
           sig_ext_sube = EXT_NULO;
         if (digitalRead(pinExt_B) == DISPARADO)
           sig_ext_baja = EXT_DISP;
+        comprueba_coche_paso();
         interrumpida_bajada = false;
         if ((digitalRead(pinBtn_B) == DISPARADO || 
-            sig_ext_baja == EXT_DISP) &&
-            !digitalRead(pinFoto_1) == DISPARADO &&
-            !digitalRead(pinFoto_2) == DISPARADO) {
+                (sig_ext_baja == EXT_DISP && (coche_paso || timeout))) &&
+                !digitalRead(pinFoto_1) == DISPARADO &&
+                !digitalRead(pinFoto_2) == DISPARADO) {
             estado = BAJANDO;
             presentaSerie = true;
         }
@@ -161,9 +176,11 @@ void loop()
     case BAJANDO:
         digitalWrite(pinR1, MLOW);
         digitalWrite(pinR2, MHIGH);
+        if (digitalRead(pinExt_S) == DISPARADO)
+          sig_ext_sube = EXT_DISP;
         if (digitalRead(pinFoto_1) == DISPARADO ||
-            digitalRead(pinFoto_2) == DISPARADO ||
-            digitalRead(pinBtn_S) == DISPARADO) {
+                digitalRead(pinFoto_2) == DISPARADO ||
+                digitalRead(pinBtn_S) == DISPARADO) {
             estado = SUBIENDO;
             interrumpida_bajada = true;
         }
@@ -175,6 +192,44 @@ void loop()
     }
 
     serialCmd();
+}
+
+void comprueba_coche_paso()
+{
+    timeout = false;
+    if (digitalRead(pinFoto_1) == DISPARADO) {
+        crono_timeout = CRONO_NULL;
+        if (crono_coche == CRONO_NULL)
+            crono_coche = millis();
+        else {
+            crono_diferencia_coche = millis() - crono_coche;
+            crono_coche = CRONO_NULL;
+        }
+    } else {
+        crono_coche = CRONO_NULL;
+        crono_diferencia_coche = 0;
+        comprueba_timeout();
+    }
+    if (crono_diferencia_coche > TIEMPO_MS_MINIMO_COCCHE) {
+        crono_coche = CRONO_NULL;
+        crono_diferencia_coche = 0;
+        coche_paso = true;
+    } else
+        coche_paso = false;
+}
+
+void comprueba_timeout()
+{
+    if (crono_timeout == CRONO_NULL) {
+        crono_timeout = millis();
+    } else
+        crono_diferencia_timeout = millis() - crono_timeout;
+    if (crono_diferencia_timeout > TIEMPO_MS_TIMEOUT) {
+        crono_timeout = CRONO_NULL;
+        crono_diferencia_timeout = 0;
+        timeout = true;
+    } else
+        timeout = false;
 }
 
 void serialCmd()
