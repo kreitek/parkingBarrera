@@ -16,8 +16,8 @@ del Anden Sin Limite */
 #define pinBtn_B 3
 #define pinFoto_1 12
 #define pinFoto_2 5
-#define pinFin_B 6
-#define pinFin_S 7
+#define pinFin_B 7
+#define pinFin_S 6
 #define pinR2 8
 #define pinR1 9
 #define pinExt_B 10
@@ -26,7 +26,7 @@ del Anden Sin Limite */
 char *PINES_STR[] =
     { "pin0", "pin1", "boton subir", "boton bajar", "fotocelula1",
     "fotocelula2",
-    "fincarrera bajada", "fincarrera subida", "rele2", "rele1",
+    "fincarrera subida", "fincarrera bajada", "rele2", "rele1",
     "externa bajar", "externa subir"
 };
 
