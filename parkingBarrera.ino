@@ -14,7 +14,7 @@ del Anden Sin Limite */
 
 #define pinBtn_S 2
 #define pinBtn_B 3
-#define pinFoto_1 4
+#define pinFoto_1 12
 #define pinFoto_2 5
 #define pinFin_B 6
 #define pinFin_S 7
@@ -127,7 +127,8 @@ void loop()
         digitalWrite(pinR2, MLOW);
         if (sig_ext_baja)
           sig_ext_baja = EXT_NULO;
-        if (digitalRead(pinExt_S) == DISPARADO)
+        if (digitalRead(pinExt_S) == DISPARADO &&
+            digitalRead(pinExt_B) != DISPARADO)
           sig_ext_sube = EXT_DISP;
         if (digitalRead(pinBtn_S) == DISPARADO ||
             sig_ext_sube == EXT_DISP) {
@@ -140,14 +141,16 @@ void loop()
         digitalWrite(pinR1, MHIGH);
         digitalWrite(pinR2, MLOW);
         crono_diferencia = millis() - crono_comienzo_subida;
-        if (digitalRead(pinExt_B) == DISPARADO)
+        if (digitalRead(pinExt_B) == DISPARADO &&
+            digitalRead(pinExt_S) != DISPARADO)
           sig_ext_baja = EXT_DISP;
         if (digitalRead(pinFin_S) == DISPARADO_FINCARRERA) {
             if (crono_subida == CRONO_NULL)
                 crono_subida = crono_diferencia * 95 / 100;
         } 
-        if (digitalRead(pinFin_S) == DISPARADO_FINCARRERA || (crono_diferencia > crono_subida 
-                && !interrumpida_bajada)) {
+        if (digitalRead(pinFin_S) == DISPARADO_FINCARRERA || 
+                (crono_diferencia > crono_subida &&
+                  !interrumpida_bajada)) {
             estado = SUBIDA;
             presentaSerie = true;
             Serial.print("tiempo_de_subida= ");
@@ -161,7 +164,8 @@ void loop()
         
         if (sig_ext_sube)
           sig_ext_sube = EXT_NULO;
-        if (digitalRead(pinExt_B) == DISPARADO)
+        if (digitalRead(pinExt_B) == DISPARADO &&
+            digitalRead(pinExt_S) != DISPARADO)
           sig_ext_baja = EXT_DISP;
         comprueba_coche_paso();
         interrumpida_bajada = false;
@@ -176,7 +180,8 @@ void loop()
     case BAJANDO:
         digitalWrite(pinR1, MLOW);
         digitalWrite(pinR2, MHIGH);
-        if (digitalRead(pinExt_S) == DISPARADO)
+        if (digitalRead(pinExt_S) == DISPARADO &&
+            digitalRead(pinExt_B) != DISPARADO)
           sig_ext_sube = EXT_DISP;
         if (digitalRead(pinFoto_1) == DISPARADO ||
                 digitalRead(pinFoto_2) == DISPARADO ||
