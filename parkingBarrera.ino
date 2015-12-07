@@ -14,7 +14,8 @@ del Anden Sin Limite */
 
 #define pinBtn_S 2
 #define pinBtn_B 3
-#define pinFoto_1 12
+//#define pinFoto_1 12 // Para que la barrera trabaje sin fotocelula
+#define pinFoto_1 4   // Para que la barrera trabaje con fotocelula
 #define pinFoto_2 5
 #define pinFin_B 7
 #define pinFin_S 6
@@ -53,7 +54,16 @@ unsigned long crono_coche, crono_diferencia_coche;
 #define EXT_NULO 0
 #define EXT_DISP 1
 #define TIEMPO_MS_MINIMO_COCCHE 2000
+
+/* ***
+   *** TIEMPO_MS_TIMEOUT reducido para acortar el tiempo
+   ***   de espera para bajar la barrera cuando recibe
+   ***   la señal externa de bajada
+   ***
 #define TIEMPO_MS_TIMEOUT 5000
+*/
+#define TIEMPO_MS_TIMEOUT 2500
+
 boolean coche_paso;
 boolean timeout;
 
@@ -99,19 +109,21 @@ void setup()
 
     sig_ext_sube = EXT_NULO;
     sig_ext_baja = EXT_NULO;
-    coche_paso = false;
-    timeout = false;
     tiempoS = false;
     tiempoB = false;
     presentaSerie = true;
     crono_comienzo_subida = 0;
     crono_diferencia = 0;
     crono_subida = CRONO_NULL;
+    interrumpida_bajada = false;
+
+    // Variables del sensor automatico de coche
+    coche_paso = false;
+    timeout = false;
     crono_diferencia_coche = 0;
     crono_coche = CRONO_NULL;
     crono_diferencia_timeout = 0;
     crono_timeout = CRONO_NULL;
-    interrumpida_bajada = false;
 }
 
 void loop()
@@ -175,6 +187,7 @@ void loop()
                 !digitalRead(pinFoto_2) == DISPARADO) {
             estado = BAJANDO;
             presentaSerie = true;
+            reset_crono_coche();
         }
         break;
     case BAJANDO:
@@ -202,38 +215,55 @@ void loop()
 void comprueba_coche_paso()
 {
     timeout = false;
+
     if (digitalRead(pinFoto_1) == DISPARADO) {
+        // Se resetea el cronometro por exceso de tiempo
         crono_timeout = CRONO_NULL;
+
+        // Si el cronometro del intervalo con sensor bloqueado 
+        //   es nulo se incia el cronometro. 
+        // Si no, se mide la longitud del intervalo
         if (crono_coche == CRONO_NULL)
             crono_coche = millis();
-        else {
+        else
             crono_diferencia_coche = millis() - crono_coche;
-            crono_coche = CRONO_NULL;
-        }
-    } else {
-        crono_coche = CRONO_NULL;
-        crono_diferencia_coche = 0;
-        comprueba_timeout();
-    }
-    if (crono_diferencia_coche > TIEMPO_MS_MINIMO_COCCHE) {
-        crono_coche = CRONO_NULL;
-        crono_diferencia_coche = 0;
-        coche_paso = true;
+/*  ***
+    *** El disparador por la var coche_paso
+    ***   queda desactivada con este bloque de comentarios
+    ***   Se quiere conseguir que solo se dispare por timeout
+    ***
+       // El intervalo de tiempo minimo indica si el coche paso
+       if (crono_diferencia_coche > TIEMPO_MS_MINIMO_COCCHE)
+           coche_paso = true;
+       else
+           coche_paso = false;
+*/
     } else
-        coche_paso = false;
+        // Se chequea si hay un exceso de tiempo en espera
+        comprueba_timeout();
+
+}
+
+void reset_crono_coche() {
+    crono_coche = CRONO_NULL;
+    crono_timeout = CRONO_NULL;
+    crono_diferencia_coche = 0;
+    crono_diferencia_timeout = 0;
 }
 
 void comprueba_timeout()
 {
-    if (crono_timeout == CRONO_NULL) {
+    // Se resetea el cronometro por intervalo 
+    crono_coche = CRONO_NULL;
+
+    if (crono_timeout == CRONO_NULL)
         crono_timeout = millis();
-    } else
+    else
         crono_diferencia_timeout = millis() - crono_timeout;
-    if (crono_diferencia_timeout > TIEMPO_MS_TIMEOUT) {
-        crono_timeout = CRONO_NULL;
-        crono_diferencia_timeout = 0;
+
+    if (crono_diferencia_timeout > TIEMPO_MS_TIMEOUT)
         timeout = true;
-    } else
+    else
         timeout = false;
 }
 
