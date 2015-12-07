@@ -160,9 +160,14 @@ void loop()
             if (crono_subida == CRONO_NULL)
                 crono_subida = crono_diferencia * 95 / 100;
         } 
-        if (digitalRead(pinFin_S) == DISPARADO_FINCARRERA || 
-                (crono_diferencia > crono_subida &&
-                  !interrumpida_bajada)) {
+        if (digitalRead(pinFin_S) == DISPARADO_FINCARRERA 
+                /* ***
+                   *** No temporizador de subida
+                   *** 
+                || (crono_diferencia > crono_subida &&
+                  !interrumpida_bajada)
+                  */
+                  ) {
             estado = SUBIDA;
             presentaSerie = true;
             Serial.print("tiempo_de_subida= ");
