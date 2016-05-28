@@ -47,28 +47,28 @@ void webpage_form(EthernetClient &client) {
   client.print(rele2());
   client.print(F("</p>"));
 
-  client.print(F("<p>A0 Obstaculo: "));
-  client.print(obstaculo());
-  client.print(F("</p>"));
-
-  client.print(F("<p>A1 Final carrera abierta: "));
-  client.print(final_carrera_abierta());
-  client.print(F("</p>"));
-
-  client.print(F("<p>D4 Final carrera cerrada: "));
-  client.print(final_carrera_cerrada());
-  client.print(F("</p>"));
-
-  client.print(F("<p>D5 Boton abrir automatico: "));
+  client.print(F("<p>A0 Boton abrir automatico: "));
   client.print(boton_abrir_automatico());
   client.print(F("</p>"));
 
-  client.print(F("<p>D2/SDA Boton abrir manual: "));
+  client.print(F("<p>A1 Boton abrir manual: "));
   client.print(boton_abrir_manual());
   client.print(F("</p>"));
 
-  client.print(F("<p>D3/SCL Boton cerrar: "));
+  client.print(F("<p>D4 Boton cerrar: "));
   client.print(boton_cerrar());
+  client.print(F("</p>"));
+
+  client.print(F("<p>D5 Obstaculo: "));
+  client.print(obstaculo());
+  client.print(F("</p>"));
+
+  client.print(F("<p>D2 Final carrera abierta: "));
+  client.print(final_carrera_abierta());
+  client.print(F("</p>"));
+
+  client.print(F("<p>D3 Final carrera cerrada: "));
+  client.print(final_carrera_cerrada());
   client.print(F("</p>"));
 
   client.print(F("<p>Estado: "));
