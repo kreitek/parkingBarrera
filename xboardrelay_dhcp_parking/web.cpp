@@ -39,19 +39,43 @@ void webpage_form(EthernetClient &client) {
     client.print(i==5 ? F("</p>") : F(":")); 
   }
 
-  client.print(F("<p>Rele1 "));
-  client.print(rele1_str());
+  client.print(F("<p>Rele1: "));
+  client.print(rele1());
   client.print(F("</p>"));
 
-  client.print(F("<p>Rele2 "));
-  client.print(rele2_str());
+  client.print(F("<p>Rele2: "));
+  client.print(rele2());
   client.print(F("</p>"));
 
-  client.print(F("<p>Estado "));
+  client.print(F("<p>A0 Obstaculo: "));
+  client.print(obstaculo());
+  client.print(F("</p>"));
+
+  client.print(F("<p>A1 Final carrera abierta: "));
+  client.print(final_carrera_abierta());
+  client.print(F("</p>"));
+
+  client.print(F("<p>D4 Final carrera cerrada: "));
+  client.print(final_carrera_cerrada());
+  client.print(F("</p>"));
+
+  client.print(F("<p>D5 Boton abrir automatico: "));
+  client.print(boton_abrir_automatico());
+  client.print(F("</p>"));
+
+  client.print(F("<p>D2/SDA Boton abrir manual: "));
+  client.print(boton_abrir_manual());
+  client.print(F("</p>"));
+
+  client.print(F("<p>D3/SCL Boton cerrar: "));
+  client.print(boton_cerrar());
+  client.print(F("</p>"));
+
+  client.print(F("<p>Estado: "));
   client.print(EstadoStr());
   client.print(F("</p>"));
 
-  client.print(F("<p>Orden "));
+  client.print(F("<p>Orden: "));
   client.print(OrdenStr());
   client.print(F("</p>"));
 
