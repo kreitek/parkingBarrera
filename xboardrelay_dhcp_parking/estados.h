@@ -24,4 +24,5 @@ bool estado_siguiente(Estado siguiente);
 const __FlashStringHelper* EstadoStr();
 const __FlashStringHelper* OrdenStr();
 
+extern long unsigned int estado_millis;
 extern long unsigned int ultima_orden_millis;

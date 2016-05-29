@@ -7,6 +7,7 @@
 Estado estado = INICIAL;
 Orden orden = ORDEN_NINGUNA;
 Orden ultima_orden = ORDEN_NINGUNA;
+long unsigned int estado_millis = 0;
 long unsigned int ultima_orden_millis = 0;
 long unsigned int abierta_libre_millis = 0;
 
@@ -18,6 +19,7 @@ bool orden_siguiente(Orden siguiente) {
 
 bool estado_siguiente(Estado siguiente) {
   estado = siguiente;
+  estado_millis = millis();
 }
 
 void estado_loop() {

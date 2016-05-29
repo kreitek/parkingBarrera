@@ -31,7 +31,9 @@ void webpage_form(EthernetClient &client) {
 
   client.print(F("<li>Estado: "));
   client.print(EstadoStr());
-  client.print(F("</li>"));
+  client.print(F(" hace "));
+  client.print((millis()-estado_millis)/1000);
+  client.print(F(" sg</li>"));
 
   client.print(F("<li>Uptime: "));
   client.print(millis()/1000);
