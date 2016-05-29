@@ -16,10 +16,10 @@ bool estado_siguiente(Estado siguiente) {
 }
 
 void estado_loop() {
+  // la web puede habernos dado una orden en otro ciclo
 
-  /* esto es para setear nuevos 'orden' usando boton, siempre que 
-     sean diferentes a los de la anterior iteracion */
-
+  // boton: trigger para evitar repetir la orden cuando mantenemos pulsado
+  // FIXME: mover este antirebote a hardware
   Orden orden_boton_nueva;
 
   if (boton_abrir_manual())
@@ -36,13 +36,15 @@ void estado_loop() {
     if (orden_boton_nueva != ORDEN_NINGUNA)
       orden = orden_boton_nueva;
   }
- 
+
+  // atendiendo orden de boton (o de web)
   if (orden == ORDEN_ABRIR_AUTOMATICO)
     estado_siguiente(ABRIENDO_AUTOMATICO);
   else if (orden == ORDEN_ABRIR_MANUAL)
     estado_siguiente(ABRIENDO_MANUAL);
   else if (orden == ORDEN_CERRAR)
     estado_siguiente(CERRANDO_MANUAL);
+  orden = ORDEN_NINGUNA; // atendida
   
   switch (estado) {
     case INICIAL:
@@ -112,9 +114,6 @@ void estado_loop() {
         cierra();
       break;
   }
-
-  /* marcamos la orden como atendida para no repetirla */
-  orden = ORDEN_NINGUNA;
 }
 
 const __FlashStringHelper* EstadoStr() {
