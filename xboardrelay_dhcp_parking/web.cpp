@@ -7,7 +7,7 @@
 uHTTP server = uHTTP(PORT);
 
 bool tiene_ip = false;
-long unsigned int cronometro_ip = 99999999; // asegura que cargue dhcp al iniciar (si millis() == 0)
+long unsigned int ethernet_millis = 99999999; // asegura que cargue dhcp al iniciar (si millis() == 0)
 
 void web_setup() {
   server.begin();
@@ -154,13 +154,13 @@ void error(EthernetClient &client) {
 
 void ethernet_loop() {
   if (!tiene_ip) {
-    if (millis() - cronometro_ip > 30000)
+    if (millis() - ethernet_millis > 30000)
       if (Ethernet.begin(MAC)) {
         serial_print_localip();
         tiene_ip = true;
       } else {
         Serial.println(F("Failed to configure Ethernet using dhcp. Sleeping 30sg..."));
-        cronometro_ip = millis();
+        ethernet_millis = millis();
       }
   } else {
     // Esta funcion solo da verbosidad a la llamada
