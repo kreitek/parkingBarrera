@@ -35,6 +35,12 @@ void webpage_form(EthernetClient &client) {
   client.print((millis()-estado_millis)/1000);
   client.print(F(" sg</li>"));
 
+  client.print(F("<li>Ultima orden: "));
+  client.print(OrdenStr());
+  client.print(F(" hace "));
+  client.print((millis()-ultima_orden_millis)/1000);
+  client.print(F(" sg</li>"));
+
   client.print(F("<li>Uptime: "));
   client.print(millis()/1000);
   client.print(F(" sg</li>"));
@@ -45,12 +51,6 @@ void webpage_form(EthernetClient &client) {
     client.print(MAC[i]%16, HEX);
     client.print(i==5 ? F("</li>") : F(":")); 
   }
-
-  client.print(F("<li>Ultima orden: "));
-  client.print(OrdenStr());
-  client.print(F(" hace "));
-  client.print((millis()-ultima_orden_millis)/1000);
-  client.print(F(" sg</li>"));
 
   client.print(F("</ul>"));
 
