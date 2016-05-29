@@ -13,6 +13,32 @@ void web_setup() {
   server.begin();
 }
 
+void web_time(EthernetClient &client, long unsigned int time_millis) {
+  long unsigned int segundos = (millis()-time_millis)/1000;
+  long unsigned int minutos = segundos / 60;
+  unsigned int horas = minutos / 60;
+  unsigned int dias = horas / 24;
+  segundos = segundos % 60;
+  minutos = minutos % 60;
+  horas = horas % 24;
+
+  if (dias > 0) {
+    client.print(dias);
+    client.print(F("d "));
+  }
+  if (horas < 10)
+    client.print(F("0"));
+  client.print(horas);
+  client.print(":");
+  if (minutos < 10)
+    client.print(F("0"));
+  client.print(minutos);
+  client.print(F(":"));
+  if (segundos < 10)
+    client.print(F("0"));
+  client.print(segundos);
+}
+
 void webpage_form(EthernetClient &client) {
   client.println(F("HTTP/1.1 200 OK"));
   client.println(F("Content-Type: text/html"));
@@ -32,18 +58,18 @@ void webpage_form(EthernetClient &client) {
   client.print(F("<li>Estado: "));
   client.print(EstadoStr());
   client.print(F(" hace "));
-  client.print((millis()-estado_millis)/1000);
-  client.print(F(" sg</li>"));
+  web_time(client, estado_millis);
+  client.print(F("</li>"));
 
   client.print(F("<li>Ultima orden: "));
   client.print(OrdenStr());
   client.print(F(" hace "));
-  client.print((millis()-ultima_orden_millis)/1000);
-  client.print(F(" sg</li>"));
+  web_time(client, ultima_orden_millis);
+  client.print(F("</li>"));
 
   client.print(F("<li>Uptime: "));
-  client.print(millis()/1000);
-  client.print(F(" sg</li>"));
+  web_time(client, 0);
+  client.print(F("</li>"));
 
   client.print(F("<li>HW Addr: "));
   for(unsigned int i=0; i<6; i++) {
