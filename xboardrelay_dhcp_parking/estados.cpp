@@ -36,8 +36,6 @@ void estado_loop() {
     if (orden_boton_nueva != ORDEN_NINGUNA)
       orden = orden_boton_nueva;
   }
- 
-  /* esta es la máquina de estados */
   
   switch (estado) {
     case INICIAL:
@@ -46,7 +44,7 @@ void estado_loop() {
       else if (final_carrera_abierta())
         estado_siguiente(ABIERTA_MANUAL);
       else
-        abre();
+        estado_siguiente(ABRIENDO_MANUAL);
       break;
       
     case CERRADA:
@@ -59,7 +57,11 @@ void estado_loop() {
       break;
       
     case ABRIENDO_AUTOMATICO:
-      if (final_carrera_abierta())
+      if (orden == ORDEN_ABRIR_MANUAL)
+        estado_siguiente(ABRIENDO_MANUAL);
+      else if (orden == ORDEN_CERRAR)
+        estado_siguiente(CERRANDO_MANUAL);
+      else if (final_carrera_abierta())
         estado_siguiente(ABIERTA_OCUPADA);
       else
         abre();
@@ -71,6 +73,8 @@ void estado_loop() {
         cronometro = millis();
       } else if (orden == ORDEN_ABRIR_MANUAL) {
         estado_siguiente(ABIERTA_MANUAL);
+      } else if (orden == ORDEN_CERRAR) {
+        estado_siguiente(CERRANDO_MANUAL);
       } else {
         apaga();
       }
@@ -81,6 +85,8 @@ void estado_loop() {
         estado_siguiente(ABIERTA_OCUPADA);
       else if (orden == ORDEN_ABRIR_MANUAL)
         estado_siguiente(ABIERTA_MANUAL);
+      else if (orden == ORDEN_CERRAR)
+        estado_siguiente(CERRANDO_MANUAL);
       else if (millis() - cronometro > 5000)
         estado_siguiente(CERRANDO_AUTOMATICO);
       else
@@ -90,6 +96,10 @@ void estado_loop() {
     case CERRANDO_AUTOMATICO:
       if (obstaculo()) 
         estado_siguiente(ABRIENDO_AUTOMATICO);
+      else if (orden == ORDEN_ABRIR_MANUAL)
+        estado_siguiente(ABRIENDO_MANUAL);
+      else if (orden == ORDEN_CERRAR)
+        estado_siguiente(CERRANDO_MANUAL);
       else if (final_carrera_cerrada())
         estado_siguiente(CERRADA);
       else
@@ -97,7 +107,11 @@ void estado_loop() {
       break;
 
     case ABRIENDO_MANUAL:
-      if (final_carrera_abierta())
+      if (orden == ORDEN_ABRIR_AUTOMATICO) 
+        estado_siguiente(ABRIENDO_AUTOMATICO);
+      else if (orden == ORDEN_CERRAR) 
+        estado_siguiente(CERRANDO_AUTOMATICO);
+      else if (final_carrera_abierta())
         estado_siguiente(ABIERTA_MANUAL);
       else
         abre();
@@ -117,6 +131,8 @@ void estado_loop() {
         estado_siguiente(ABRIENDO_MANUAL);
       else if (orden == ORDEN_ABRIR_MANUAL)
         estado_siguiente(ABRIENDO_MANUAL);
+      else if (orden == ORDEN_ABRIR_AUTOMATICO)
+        estado_siguiente(ABRIENDO_AUTOMATICO);
       else if (final_carrera_cerrada())
         estado_siguiente(CERRADA);
       else
