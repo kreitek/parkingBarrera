@@ -4,8 +4,8 @@
 // pinout
 #define RELE1            8   // D8 rele cable motor que a positivo abriria
 #define RELE2            7   // D7 rele cable motor que a negativo abriria
-#define ABRIR_AUTOMATICO 0   // A0 fotocelula que a 0V significa que algo está cortando el haz
-#define ABRIR_MANUAL     1   // A1 fin carrera abierta/abierta con pullup que a 0V significa que llegó al final
+#define ABRIR_AUTOMATICO A0   // A0 fotocelula que a 0V significa que algo está cortando el haz
+#define ABRIR_MANUAL     A1   // A1 fin carrera abierta/abierta con pullup que a 0V significa que llegó al final
 #define CERRAR           4   // D4 fin carrera cerrada/cerrada con pullup que a 0V significa que llegó al final
 #define LUX              5   // D5 boton que abre en modo automatico
 #define FCA              2   // D2 boton que abre en modo manual
@@ -60,13 +60,11 @@ bool final_carrera_cerrada() {
 }
 
 bool boton_abrir_automatico() {
-  //return digitalRead(ABRIR_AUTOMATICO) == LOW;
-  return analogRead(ABRIR_AUTOMATICO) < 512;
+  return digitalRead(ABRIR_AUTOMATICO) == LOW;
 }
 
 bool boton_abrir_manual() {
-  //return digitalRead(ABRIR_MANUAL) == LOW;
-  return analogRead(ABRIR_MANUAL) < 512;
+  return digitalRead(ABRIR_MANUAL) == LOW;
 }
 
 bool boton_cerrar() {
