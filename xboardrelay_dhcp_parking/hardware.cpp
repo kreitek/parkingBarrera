@@ -71,4 +71,28 @@ bool boton_cerrar() {
   return digitalRead(CERRAR) == LOW;
 }
 
+bool trigger(bool actual, bool &memoria) {
+  if (memoria == actual) {
+    return false;
+  } else {
+    memoria = actual;
+    return actual;
+  }
+}
+
+bool trigger_abrir_automatico() {
+  static bool memoria = false;
+  return trigger(boton_abrir_automatico(), memoria);
+}
+
+bool trigger_abrir_manual() {
+  static bool memoria = false;
+  return trigger(boton_abrir_manual(), memoria);
+}
+
+bool trigger_cerrar() {
+  static bool memoria = false;
+  return trigger(boton_cerrar(), memoria);
+}
+
 // vim: ai:expandtab:ts=2:sw=2

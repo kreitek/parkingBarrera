@@ -20,3 +20,6 @@ bool final_carrera_cerrada();
 bool boton_abrir_automatico();
 bool boton_abrir_manual();
 bool boton_cerrar();
+bool trigger_abrir_automatico();
+bool trigger_abrir_manual();
+bool trigger_cerrar();

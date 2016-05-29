@@ -4,7 +4,6 @@
 
 Estado estado = INICIAL;
 Orden orden = ORDEN_NINGUNA;
-Orden orden_boton_ultima = ORDEN_NINGUNA;
 long unsigned int cronometro = 0;
 
 bool orden_siguiente(Orden siguiente) {
@@ -16,25 +15,15 @@ bool estado_siguiente(Estado siguiente) {
 }
 
 void estado_loop() {
-  // la web puede habernos dado una orden en otro ciclo
-
-  // boton: trigger para evitar repetir la orden cuando mantenemos pulsado
-  // FIXME: mover este antirebote a hardware
-  Orden orden_boton_nueva;
-
-  if (boton_abrir_manual())
-    orden_boton_nueva = ORDEN_ABRIR_MANUAL;
-  else if (boton_abrir_automatico())
-    orden_boton_nueva = ORDEN_ABRIR_AUTOMATICO;
-  else if (boton_cerrar())
-    orden_boton_nueva = ORDEN_CERRAR;
-  else 
-    orden_boton_nueva = ORDEN_NINGUNA;
-
-  if (orden_boton_nueva != orden_boton_ultima) {
-    orden_boton_ultima = orden_boton_nueva;
-    if (orden_boton_nueva != ORDEN_NINGUNA)
-      orden = orden_boton_nueva;
+  // no sobreescribimos orden de la web
+  if (orden == ORDEN_NINGUNA) {
+    // triggers de botones evitan repetir la orden cuando mantenemos pulsado
+    if (trigger_abrir_manual())
+      orden = ORDEN_ABRIR_MANUAL;
+    else if (trigger_abrir_automatico())
+      orden = ORDEN_ABRIR_AUTOMATICO;
+    else if (trigger_cerrar())
+      orden = ORDEN_CERRAR;
   }
 
   // atendiendo orden de boton (o de web)
@@ -44,8 +33,11 @@ void estado_loop() {
     estado_siguiente(ABRIENDO_MANUAL);
   else if (orden == ORDEN_CERRAR)
     estado_siguiente(CERRANDO_MANUAL);
-  orden = ORDEN_NINGUNA; // atendida
+
+  // atendida
+  orden = ORDEN_NINGUNA; 
   
+  // maquina de estados: if transiciones else if transiciones else comando hardware
   switch (estado) {
     case INICIAL:
       if (final_carrera_cerrada())
