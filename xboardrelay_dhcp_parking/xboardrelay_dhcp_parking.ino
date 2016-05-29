@@ -9,7 +9,7 @@
 void setup() {
   Serial.begin(9600);
   hardware_setup();
-  ethernet_setup();
+  web_setup();
 }
 
 void loop() {

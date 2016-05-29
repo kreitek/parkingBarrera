@@ -4,7 +4,7 @@
 
 extern uHTTP server;
 
-void ethernet_setup();
+void web_setup();
 void webpage_form(EthernetClient &client);
 void redirect(EthernetClient &client, String uri);
 void unauthorized(EthernetClient &client);

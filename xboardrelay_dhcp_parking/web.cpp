@@ -6,13 +6,10 @@
 
 uHTTP server = uHTTP(PORT);
 
-void ethernet_setup() {
-  while(Ethernet.begin(MAC) == 0) {
-    Serial.println(F("Failed to configure Ethernet using dhcp. Sleeping 30sg..."));
-    delay(30000);
-  }
-  serial_print_localip();
+bool tiene_ip = false;
+long unsigned int cronometro_ip = 99999999; // asegura que cargue dhcp al iniciar (si millis() == 0)
 
+void web_setup() {
   server.begin();
 }
 
@@ -132,25 +129,36 @@ void error(EthernetClient &client) {
 }
 
 void ethernet_loop() {
-  // Esta funcion solo da verbosidad a la llamada Ethernet.maintain()
-  // y se podria sustituir por ella.
-  switch (Ethernet.maintain()) {
-    case 1:
-      Serial.println(F("Error: renewed fail"));
-      break;
-    case 2:
-      Serial.println(F("Renewed success"));
-      serial_print_localip();
-      break;
-    case 3:
-      Serial.println(F("Error: rebind fail"));
-      break;
-    case 4:
-      Serial.println(F("Rebind success"));
-      serial_print_localip();
-      break;
-    default:
-      break; //nothing happened
+  if (!tiene_ip) {
+    if (millis() - cronometro_ip > 30000)
+      if (Ethernet.begin(MAC)) {
+        serial_print_localip();
+        tiene_ip = true;
+      } else {
+        Serial.println(F("Failed to configure Ethernet using dhcp. Sleeping 30sg..."));
+        cronometro_ip = millis();
+      }
+  } else {
+    // Esta funcion solo da verbosidad a la llamada
+    // Ethernet.maintain() y se podria sustituir por ella.
+    switch (Ethernet.maintain()) {
+      case 1:
+        Serial.println(F("Error: renewed fail"));
+        break;
+      case 2:
+        Serial.println(F("Renewed success"));
+        serial_print_localip();
+        break;
+      case 3:
+        Serial.println(F("Error: rebind fail"));
+        break;
+      case 4:
+        Serial.println(F("Rebind success"));
+        serial_print_localip();
+        break;
+      default:
+        break; //nothing happened
+    }
   }
 }
 
