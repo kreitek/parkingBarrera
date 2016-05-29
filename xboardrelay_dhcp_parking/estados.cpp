@@ -36,6 +36,13 @@ void estado_loop() {
     if (orden_boton_nueva != ORDEN_NINGUNA)
       orden = orden_boton_nueva;
   }
+ 
+  if (orden == ORDEN_ABRIR_AUTOMATICO)
+    estado_siguiente(ABRIENDO_AUTOMATICO);
+  else if (orden == ORDEN_ABRIR_MANUAL)
+    estado_siguiente(ABRIENDO_MANUAL);
+  else if (orden == ORDEN_CERRAR)
+    estado_siguiente(CERRANDO_MANUAL);
   
   switch (estado) {
     case INICIAL:
@@ -48,20 +55,11 @@ void estado_loop() {
       break;
       
     case CERRADA:
-      if (orden == ORDEN_ABRIR_AUTOMATICO)
-        estado_siguiente(ABRIENDO_AUTOMATICO);
-      else if (orden == ORDEN_ABRIR_MANUAL)
-        estado_siguiente(ABRIENDO_MANUAL);
-      else
-        apaga();
+      apaga();
       break;
       
     case ABRIENDO_AUTOMATICO:
-      if (orden == ORDEN_ABRIR_MANUAL)
-        estado_siguiente(ABRIENDO_MANUAL);
-      else if (orden == ORDEN_CERRAR)
-        estado_siguiente(CERRANDO_MANUAL);
-      else if (final_carrera_abierta())
+      if (final_carrera_abierta())
         estado_siguiente(ABIERTA_OCUPADA);
       else
         abre();
@@ -71,10 +69,6 @@ void estado_loop() {
       if (!obstaculo()) {
         estado_siguiente(ABIERTA_LIBRE);
         cronometro = millis();
-      } else if (orden == ORDEN_ABRIR_MANUAL) {
-        estado_siguiente(ABIERTA_MANUAL);
-      } else if (orden == ORDEN_CERRAR) {
-        estado_siguiente(CERRANDO_MANUAL);
       } else {
         apaga();
       }
@@ -83,10 +77,6 @@ void estado_loop() {
     case ABIERTA_LIBRE:
       if (obstaculo())
         estado_siguiente(ABIERTA_OCUPADA);
-      else if (orden == ORDEN_ABRIR_MANUAL)
-        estado_siguiente(ABIERTA_MANUAL);
-      else if (orden == ORDEN_CERRAR)
-        estado_siguiente(CERRANDO_MANUAL);
       else if (millis() - cronometro > 5000)
         estado_siguiente(CERRANDO_AUTOMATICO);
       else
@@ -96,10 +86,6 @@ void estado_loop() {
     case CERRANDO_AUTOMATICO:
       if (obstaculo()) 
         estado_siguiente(ABRIENDO_AUTOMATICO);
-      else if (orden == ORDEN_ABRIR_MANUAL)
-        estado_siguiente(ABRIENDO_MANUAL);
-      else if (orden == ORDEN_CERRAR)
-        estado_siguiente(CERRANDO_MANUAL);
       else if (final_carrera_cerrada())
         estado_siguiente(CERRADA);
       else
@@ -107,32 +93,19 @@ void estado_loop() {
       break;
 
     case ABRIENDO_MANUAL:
-      if (orden == ORDEN_ABRIR_AUTOMATICO) 
-        estado_siguiente(ABRIENDO_AUTOMATICO);
-      else if (orden == ORDEN_CERRAR) 
-        estado_siguiente(CERRANDO_AUTOMATICO);
-      else if (final_carrera_abierta())
+      if (final_carrera_abierta())
         estado_siguiente(ABIERTA_MANUAL);
       else
         abre();
       break;
       
     case ABIERTA_MANUAL:
-      if (orden == ORDEN_CERRAR) 
-        estado_siguiente(CERRANDO_MANUAL);
-      else if (orden == ORDEN_ABRIR_AUTOMATICO) 
-        estado_siguiente(ABIERTA_OCUPADA);
-      else
-        apaga();
+      apaga();
       break;
 
     case CERRANDO_MANUAL:
       if (obstaculo())
         estado_siguiente(ABRIENDO_MANUAL);
-      else if (orden == ORDEN_ABRIR_MANUAL)
-        estado_siguiente(ABRIENDO_MANUAL);
-      else if (orden == ORDEN_ABRIR_AUTOMATICO)
-        estado_siguiente(ABRIENDO_AUTOMATICO);
       else if (final_carrera_cerrada())
         estado_siguiente(CERRADA);
       else
