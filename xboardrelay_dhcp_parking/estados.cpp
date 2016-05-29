@@ -4,10 +4,14 @@
 
 Estado estado = INICIAL;
 Orden orden = ORDEN_NINGUNA;
-long unsigned int cronometro = 0;
+Orden ultima_orden = ORDEN_NINGUNA;
+long unsigned int ultima_orden_millis = 0;
+long unsigned int abierta_libre_millis = 0;
 
 bool orden_siguiente(Orden siguiente) {
   orden = siguiente;
+  ultima_orden = siguiente;
+  ultima_orden_millis = millis();
 }
 
 bool estado_siguiente(Estado siguiente) {
@@ -19,11 +23,11 @@ void estado_loop() {
   if (orden == ORDEN_NINGUNA) {
     // triggers de botones evitan repetir la orden cuando mantenemos pulsado
     if (trigger_abrir_manual())
-      orden = ORDEN_ABRIR_MANUAL;
+      orden_siguiente(ORDEN_ABRIR_MANUAL);
     else if (trigger_abrir_automatico())
-      orden = ORDEN_ABRIR_AUTOMATICO;
+      orden_siguiente(ORDEN_ABRIR_AUTOMATICO);
     else if (trigger_cerrar())
-      orden = ORDEN_CERRAR;
+      orden_siguiente(ORDEN_CERRAR);
   }
 
   // atendiendo orden de boton (o de web)
@@ -62,7 +66,7 @@ void estado_loop() {
     case ABIERTA_OCUPADA:
       if (!obstaculo()) {
         estado_siguiente(ABIERTA_LIBRE);
-        cronometro = millis();
+        abierta_libre_millis = millis();
       } else {
         apaga();
       }
@@ -71,7 +75,7 @@ void estado_loop() {
     case ABIERTA_LIBRE:
       if (obstaculo())
         estado_siguiente(ABIERTA_OCUPADA);
-      else if (millis() - cronometro > 5000)
+      else if (millis() - abierta_libre_millis > 5000)
         estado_siguiente(CERRANDO_AUTOMATICO);
       else
         apaga();
@@ -124,7 +128,7 @@ const __FlashStringHelper* EstadoStr() {
 }
 
 const __FlashStringHelper* OrdenStr() {
-    switch (orden) {
+    switch (ultima_orden) {
         case ORDEN_NINGUNA:          return F("Ninguna");
         case ORDEN_ABRIR_AUTOMATICO: return F("Abrir automatico");
         case ORDEN_ABRIR_MANUAL:     return F("Abrir manual");

@@ -25,66 +25,88 @@ void webpage_form(EthernetClient &client) {
   client.print(HOSTNAME);
   client.print(F("'</h1>"));
 
-  client.print(F("<p>uptime "));
-  client.print(millis()/1000);
-  client.print(F(" sg</p>"));
+  client.print(F("<h2>Status</h2>"));
 
-  client.print(F("<p>mac "));
+  client.print(F("<ul>"));
+
+  client.print(F("<li>Estado: "));
+  client.print(EstadoStr());
+  client.print(F("</li>"));
+
+  client.print(F("<li>Uptime: "));
+  client.print(millis()/1000);
+  client.print(F(" sg</li>"));
+
+  client.print(F("<li>HW Addr: "));
   for(unsigned int i=0; i<6; i++) {
     client.print(MAC[i]/16, HEX);
     client.print(MAC[i]%16, HEX);
-    client.print(i==5 ? F("</p>") : F(":")); 
+    client.print(i==5 ? F("</li>") : F(":")); 
   }
 
-  client.print(F("<p>Rele1: "));
-  client.print(rele1());
-  client.print(F("</p>"));
-
-  client.print(F("<p>Rele2: "));
-  client.print(rele2());
-  client.print(F("</p>"));
-
-  client.print(F("<p>A0 Boton abrir automatico: "));
-  client.print(boton_abrir_automatico());
-  client.print(F("</p>"));
-
-  client.print(F("<p>A1 Boton abrir manual: "));
-  client.print(boton_abrir_manual());
-  client.print(F("</p>"));
-
-  client.print(F("<p>D4 Boton cerrar: "));
-  client.print(boton_cerrar());
-  client.print(F("</p>"));
-
-  client.print(F("<p>D5 Obstaculo: "));
-  client.print(obstaculo());
-  client.print(F("</p>"));
-
-  client.print(F("<p>D2 Final carrera abierta: "));
-  client.print(final_carrera_abierta());
-  client.print(F("</p>"));
-
-  client.print(F("<p>D3 Final carrera cerrada: "));
-  client.print(final_carrera_cerrada());
-  client.print(F("</p>"));
-
-  client.print(F("<p>Estado: "));
-  client.print(EstadoStr());
-  client.print(F("</p>"));
-
-  client.print(F("<p>Orden: "));
+  client.print(F("<li>Ultima orden: "));
   client.print(OrdenStr());
-  client.print(F("</p>"));
+  client.print(F(" hace "));
+  client.print((millis()-ultima_orden_millis)/1000);
+  client.print(F(" sg</li>"));
 
+  client.print(F("</ul>"));
+
+  client.print(F("<h2>Outputs</h2>"));
+
+  client.print(F("<ul>"));
+
+  client.print(F("<li>D7 Rele1 (abrir): "));
+  client.print(rele1());
+  client.print(F("</li>"));
+
+  client.print(F("<li>D8 Rele2 (cerrar): "));
+  client.print(rele2());
+  client.print(F("</li>"));
+
+  client.print(F("</ul>"));
+
+  client.print(F("<h2>Inputs</h2>"));
+
+  client.print(F("<ul>"));
+
+  client.print(F("<li>A0 Boton abrir automatico: "));
+  client.print(boton_abrir_automatico());
+  client.print(F("</li>"));
+
+  client.print(F("<li>A1 Boton abrir manual: "));
+  client.print(boton_abrir_manual());
+  client.print(F("</li>"));
+
+  client.print(F("<li>D4 Boton cerrar: "));
+  client.print(boton_cerrar());
+  client.print(F("</li>"));
+
+  client.print(F("<li>D5 Obstaculo: "));
+  client.print(obstaculo());
+  client.print(F("</li>"));
+
+  client.print(F("<li>D2 Final carrera abierta: "));
+  client.print(final_carrera_abierta());
+  client.print(F("</li>"));
+
+  client.print(F("<li>D3 Final carrera cerrada: "));
+  client.print(final_carrera_cerrada());
+  client.print(F("</li>"));
+  client.print(F("</ul>"));
+
+  client.print(F("<h2>Actions</h2>"));
+
+  client.print(F("<button onclick=\"location.reload()\">Refrescar</button>"));
 
   client.print(F( \
     "<form method=POST>" \
-    "<div>Password <input type=password name=key></div>" \
     "<div>" \
     "  <input type=submit name=abrir_cerrar value=\"abrir automatico\">" \
     "  <input type=submit name=abrir value=\"abrir siempre\">" \
     "  <input type=submit name=cerrar value=\"cerrar\">" \
     "</div>" \
+    "<div>Password <input type=password name=key></div>" \
     "</form>"));
 
   client.print(F("</html>"));

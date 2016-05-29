@@ -22,3 +22,5 @@ bool orden_siguiente(Orden siguiente);
 bool estado_siguiente(Estado siguiente);
 const __FlashStringHelper* EstadoStr();
 const __FlashStringHelper* OrdenStr();
+
+extern long unsigned int ultima_orden_millis;
