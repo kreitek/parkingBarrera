@@ -96,6 +96,13 @@ void estado_loop() {
         cierra();
       break;
 
+    case ABRIENDO_MANUAL:
+      if (final_carrera_abierta())
+        estado_siguiente(ABIERTA_MANUAL);
+      else
+        abre();
+      break;
+      
     case ABIERTA_MANUAL:
       if (orden == ORDEN_CERRAR) 
         estado_siguiente(CERRANDO_MANUAL);
@@ -106,7 +113,9 @@ void estado_loop() {
       break;
 
     case CERRANDO_MANUAL:
-      if (orden == ORDEN_ABRIR_MANUAL)
+      if (obstaculo())
+        estado_siguiente(ABRIENDO_MANUAL);
+      else if (orden == ORDEN_ABRIR_MANUAL)
         estado_siguiente(ABRIENDO_MANUAL);
       else if (final_carrera_cerrada())
         estado_siguiente(CERRADA);
