@@ -2,6 +2,8 @@
 #include "estados.h"
 #include "hardware.h"
 
+#define ABIERTA_LIBRE_ESPERAR 5000
+
 Estado estado = INICIAL;
 Orden orden = ORDEN_NINGUNA;
 Orden ultima_orden = ORDEN_NINGUNA;
@@ -82,7 +84,7 @@ void estado_loop() {
     case ABIERTA_LIBRE:
       if (obstaculo())
         estado_siguiente(ABIERTA_OCUPADA);
-      else if (millis() - abierta_libre_millis > 5000)
+      else if (millis() - abierta_libre_millis > ABIERTA_LIBRE_ESPERAR)
         estado_siguiente(CERRANDO_AUTOMATICO);
       else
         apaga();
