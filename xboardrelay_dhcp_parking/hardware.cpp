@@ -1,17 +1,17 @@
 #include <Arduino.h>
 #include "hardware.h"
 
-// pinout
+// pinout PCB
 #define RELE1            8   // D8 rele cable motor que a positivo abriria
 #define RELE2            7   // D7 rele cable motor que a negativo abriria
-#define ABRIR_AUTOMATICO A0   // A0 fotocelula que a 0V significa que algo está cortando el haz
-#define ABRIR_MANUAL     A1   // A1 fin carrera abierta/abierta con pullup que a 0V significa que llegó al final
-#define CERRAR           4   // D4 fin carrera cerrada/cerrada con pullup que a 0V significa que llegó al final
-#define LUX              5   // D5 boton que abre en modo automatico
-#define FCA              2   // D2 boton que abre en modo manual
-#define FCC              3   // D3 boton que cierra
+#define ABRIR_AUTOMATICO A0   // A0 boton que a 0V abre en modo automatico
+#define ABRIR_MANUAL     A1   // A1 boton que a 0V abre en modo manual
+#define CERRAR           4   // D4 boton que a 0V cierra
+#define LUX              5   // D5 fotocelula que a 0V significa que algo está cortando el haz
+#define FCA              2   // D2 fin carrera abierta con pullup que a 0V significa que llegó al final
+#define FCC              3   // D3 fin carrera cerrada con pullup que a 0V significa que llegó al final
 
-// Nota: El equivalente digital de LUX y FCA (A0 y A1) depende del tipo de arduino (leonardo en este caso)
+// Nota: El equivalente digital de ABRIR_AUTOMATICO y ABRIR_MANUAL (A0 y A1) depende del tipo de arduino (leonardo en este caso)
 
 void hardware_setup() {
   pinMode(RELE1, OUTPUT);
