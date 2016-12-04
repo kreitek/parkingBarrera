@@ -67,6 +67,13 @@ void estado_loop() {
         abre();
       break;
       
+    case REABRIENDO_AUTOMATICO:
+      if (final_carrera_abierta())
+        estado_siguiente(ABIERTA_OCUPADA);
+      else
+        abre();
+      break;
+      
     case ABIERTA_SIN_OCUPAR:
       if (obstaculo())
         estado_siguiente(ABIERTA_OCUPADA);
@@ -94,7 +101,7 @@ void estado_loop() {
 
     case CERRANDO_AUTOMATICO:
       if (obstaculo()) 
-        estado_siguiente(ABRIENDO_AUTOMATICO);
+        estado_siguiente(REABRIENDO_AUTOMATICO);
       else if (final_carrera_cerrada())
         estado_siguiente(CERRADA);
       else
@@ -128,6 +135,7 @@ const __FlashStringHelper* EstadoStr() {
         case INICIAL:                return F("Inicial");
         case CERRADA:                return F("Cerrada");
         case ABRIENDO_AUTOMATICO:    return F("Abriendo automatico");
+        case REABRIENDO_AUTOMATICO:  return F("Reabriendo automatico");
         case ABIERTA_SIN_OCUPAR:     return F("Abierta sin ocupar");
         case ABIERTA_OCUPADA:        return F("Abierta ocupada");
         case ABIERTA_LIBRE:          return F("Abierta libre");
