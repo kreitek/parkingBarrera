@@ -130,6 +130,29 @@ void estado_loop() {
   }
 }
 
+#define RAYA B0111
+#define PUNTO B0100
+#define MORSE(x, y, z) ((x*256) + (y*16) + z)
+
+unsigned int estado_mask() {
+  switch (estado) {
+      case INICIAL:                return 0xff00;
+      case CERRADA:                return MORSE(PUNTO, PUNTO, PUNTO);
+
+      case ABIERTA_MANUAL:         return MORSE(RAYA, PUNTO, PUNTO);
+      case ABIERTA_LIBRE:          return MORSE(RAYA, PUNTO, RAYA);
+      case ABIERTA_SIN_OCUPAR:     return MORSE(RAYA, RAYA, PUNTO);
+      case ABIERTA_OCUPADA:        return MORSE(RAYA, RAYA, RAYA);
+
+      case ABRIENDO_MANUAL:        return MORSE(PUNTO, PUNTO, RAYA);
+      case ABRIENDO_AUTOMATICO:    return MORSE(PUNTO, RAYA, PUNTO);
+      case REABRIENDO_AUTOMATICO:  return MORSE(PUNTO, RAYA, PUNTO);
+      case CERRANDO_MANUAL:        return MORSE(PUNTO, RAYA, RAYA);
+      case CERRANDO_AUTOMATICO:    return MORSE(PUNTO, RAYA, RAYA);
+      default:                     return 0;
+  }
+}
+
 const __FlashStringHelper* EstadoStr() {
     switch (estado) {
         case INICIAL:                return F("Inicial");

@@ -22,6 +22,7 @@ enum Orden {
 void estado_loop();
 bool orden_siguiente(Orden siguiente);
 bool estado_siguiente(Estado siguiente);
+unsigned int estado_mask();
 const __FlashStringHelper* EstadoStr();
 const __FlashStringHelper* OrdenStr();
 

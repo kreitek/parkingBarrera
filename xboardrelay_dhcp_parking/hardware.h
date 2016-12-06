@@ -9,6 +9,7 @@
 //     - NO1 -> 12V
 
 void hardware_setup();
+void led_loop(unsigned int pattern);
 void apaga();
 void cierra();
 void abre();

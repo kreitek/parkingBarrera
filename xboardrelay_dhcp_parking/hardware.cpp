@@ -10,10 +10,14 @@
 #define LUX              5   // D5 fotocelula que a 0V significa que algo está cortando el haz
 #define FCA              2   // D2 fin carrera abierta con pullup que a 0V significa que llegó al final
 #define FCC              3   // D3 fin carrera cerrada con pullup que a 0V significa que llegó al final
+#define LED              13  // Se asume que el led es logica directa, con resistencia a 0V
+
+long unsigned int led_millis = 99999999;
 
 // Nota: El equivalente digital de ABRIR_AUTOMATICO y ABRIR_MANUAL (A0 y A1) depende del tipo de arduino (leonardo en este caso)
 
 void hardware_setup() {
+  pinMode(LED, OUTPUT);
   pinMode(RELE1, OUTPUT);
   pinMode(RELE2, OUTPUT);
   pinMode(ABRIR_AUTOMATICO, INPUT_PULLUP);
@@ -22,6 +26,29 @@ void hardware_setup() {
   pinMode(LUX, INPUT_PULLUP);
   pinMode(FCA, INPUT_PULLUP);
   pinMode(FCC, INPUT_PULLUP);
+}
+
+void led_on() {
+  digitalWrite(LED, HIGH);
+}
+
+void led_off() {
+  digitalWrite(LED, LOW);
+}
+
+void led_loop(unsigned int pattern) {
+  // el pattern son 16 bits y vamos a definir que 4 bits son 1 segundo
+  static unsigned int mask = 0x8000;
+  if (millis() - led_millis > 250) {
+    if (mask & pattern) 
+      led_on();
+    else
+      led_off();
+    mask = mask >> 1;
+    if (!mask)
+      mask = 0x8000;
+    led_millis = millis();
+  }
 }
 
 void apaga() {

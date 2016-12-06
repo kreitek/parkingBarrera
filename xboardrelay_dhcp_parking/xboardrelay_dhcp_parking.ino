@@ -1,5 +1,6 @@
 // La Xboard-relay es equivalente a un "arduino leonardo"
-// Hay que instalar uHTTP de https://github.com/nomadnt/uHTTP
+// Hay que instalar uHTTP de 
+// wget https://github.com/nomadnt/uHTTP/archive/master.zip -O /tmp/uHTTP.zip
 
 #include "estados.h"
 #include "hardware.h"
@@ -52,6 +53,7 @@ void loop() {
   // cosas que hay que ejecutar a cada iteracion
   ethernet_loop(); // para renovar el dhcp lease cuando toque
   estado_loop(); // para chequear sensores y ejecutar maquina de estados
+  led_loop(estado_mask()); // para hacer el parpadeo del led
 }
 
 // vim: ai:expandtab:ts=2:sw=2
