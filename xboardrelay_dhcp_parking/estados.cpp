@@ -131,7 +131,7 @@ void estado_loop() {
 }
 
 #define RAYA B0111
-#define PUNTO B0100
+#define PUNTO B0010
 #define MORSE(x, y, z) ((x*256) + (y*16) + z)
 
 unsigned int estado_mask() {
