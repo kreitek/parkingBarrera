@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <Bounce2.h>
 #include "hardware.h"
 
 // pinout PCB
@@ -16,16 +17,53 @@ long unsigned int led_millis = 99999999;
 
 // Nota: El equivalente digital de ABRIR_AUTOMATICO y ABRIR_MANUAL (A0 y A1) depende del tipo de arduino (leonardo en este caso)
 
+#define BOUNCE_INTERVAL 5 // milliseconds
+Bounce abrir_automatico = Bounce(); 
+Bounce abrir_manual = Bounce(); 
+Bounce cerrar = Bounce(); 
+Bounce lux = Bounce(); 
+Bounce fca = Bounce(); 
+Bounce fcc = Bounce(); 
+
 void hardware_setup() {
+  // salidas
   pinMode(LED, OUTPUT);
   pinMode(RELE1, OUTPUT);
   pinMode(RELE2, OUTPUT);
+
+  // entradas, con pullup y bounce2
   pinMode(ABRIR_AUTOMATICO, INPUT_PULLUP);
+  abrir_automatico.attach(ABRIR_AUTOMATICO);
+  abrir_automatico.interval(BOUNCE_INTERVAL);
+
   pinMode(ABRIR_MANUAL, INPUT_PULLUP);
+  abrir_manual.attach(ABRIR_MANUAL);
+  abrir_manual.interval(BOUNCE_INTERVAL);
+
   pinMode(CERRAR, INPUT_PULLUP);
+  cerrar.attach(CERRAR);
+  cerrar.interval(BOUNCE_INTERVAL);
+
   pinMode(LUX, INPUT_PULLUP);
+  lux.attach(LUX);
+  lux.interval(BOUNCE_INTERVAL);
+
   pinMode(FCA, INPUT_PULLUP);
+  fca.attach(FCA);
+  fca.interval(BOUNCE_INTERVAL);
+
   pinMode(FCC, INPUT_PULLUP);
+  fcc.attach(FCC);
+  fcc.interval(BOUNCE_INTERVAL);
+}
+
+void hardware_loop() {
+  abrir_automatico.update();
+  abrir_manual.update();
+  cerrar.update();
+  lux.update();
+  fca.update();
+  fcc.update();
 }
 
 void led_on() {
@@ -75,27 +113,27 @@ bool rele2() {
 }
 
 bool obstaculo() {
-  return digitalRead(LUX) == LOW;
+  return lux.read() == LOW;
 }
 
 bool final_carrera_abierta() {
-  return digitalRead(FCA) == LOW;
+  return fca.read() == LOW;
 }
 
 bool final_carrera_cerrada() {
-  return digitalRead(FCC) == LOW;
+  return fcc.read() == LOW;
 }
 
 bool boton_abrir_automatico() {
-  return digitalRead(ABRIR_AUTOMATICO) == LOW;
+  return abrir_automatico.read() == LOW;
 }
 
 bool boton_abrir_manual() {
-  return digitalRead(ABRIR_MANUAL) == LOW;
+  return abrir_manual.read() == LOW;
 }
 
 bool boton_cerrar() {
-  return digitalRead(CERRAR) == LOW;
+  return cerrar.read() == LOW;
 }
 
 bool trigger(bool actual, bool &memoria) {
