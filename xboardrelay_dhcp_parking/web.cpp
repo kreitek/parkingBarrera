@@ -75,7 +75,7 @@ void webpage_form(EthernetClient &client) {
   for(unsigned int i=0; i<6; i++) {
     client.print(MAC[i]/16, HEX);
     client.print(MAC[i]%16, HEX);
-    client.print(i==5 ? F("</li>") : F(":")); 
+    client.print(i==5 ? F("</li>") : F(":"));
   }
 
   client.print(F("</ul>"));
@@ -154,7 +154,7 @@ void redirect(EthernetClient &client, String uri) {
 void http_response(EthernetClient &client, String message) {
   client.print(F("HTTP/1.1 "));
   client.println(message);
-  client.println(F("Content-Type: text/html"));                                                                                                
+  client.println(F("Content-Type: text/html"));
   client.println();
 
   client.println(F("<html>"));
@@ -210,6 +210,10 @@ void ethernet_loop() {
         break; //nothing happened
     }
   }
+}
+
+void ethernet_ip_setup() {
+  Ethernet.begin(MAC, IP);
 }
 
 void serial_print_connect() {

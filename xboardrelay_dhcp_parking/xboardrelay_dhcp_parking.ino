@@ -1,5 +1,5 @@
 // La Xboard-relay es equivalente a un "arduino leonardo"
-// Hay que instalar uHTTP de 
+// Hay que instalar uHTTP de
 // wget https://github.com/nomadnt/uHTTP/archive/master.zip -O /tmp/uHTTP.zip
 // Hay que instalar bounce2 de
 // wget https://github.com/thomasfredericks/Bounce2/archive/master.zip -O /tmp/bounce2.zip
@@ -14,6 +14,7 @@ void setup() {
   Serial.begin(9600);
   hardware_setup();
   web_setup();
+  ethernet_ip_setup();
 }
 
 void loop() {
@@ -33,13 +34,13 @@ void loop() {
         if (String(server.data("key")) == PASSWORD) {
           if (server.data("abrir_cerrar")) {
             orden_siguiente(ORDEN_ABRIR_AUTOMATICO);
-            redirect(client, FOLDER); 
+            redirect(client, FOLDER);
           } else if (server.data("abrir")) {
             orden_siguiente(ORDEN_ABRIR_MANUAL);
-            redirect(client, FOLDER); 
+            redirect(client, FOLDER);
           } else if (server.data("cerrar")) {
             orden_siguiente(ORDEN_CERRAR);
-            redirect(client, FOLDER); 
+            redirect(client, FOLDER);
           } else {
             error(client);
           }
@@ -55,7 +56,7 @@ void loop() {
   }
   // cosas que hay que ejecutar a cada iteracion
   hardware_loop(); // para renovar los bounces
-  ethernet_loop(); // para renovar el dhcp lease cuando toque
+  // ethernet_loop(); // para renovar el dhcp lease cuando toque
   estado_loop(); // para chequear sensores y ejecutar maquina de estados
   led_loop(estado_mask()); // para hacer el parpadeo del led
 }

@@ -2,7 +2,7 @@
 #include "estados.h"
 #include "hardware.h"
 
-#define ABIERTA_LIBRE_ESPERAR 5000
+#define ABIERTA_LIBRE_ESPERAR 3000
 
 Estado estado = INICIAL;
 Orden orden = ORDEN_NINGUNA;
@@ -43,8 +43,8 @@ void estado_loop() {
     estado_siguiente(CERRANDO_MANUAL);
 
   // atendida
-  orden = ORDEN_NINGUNA; 
-  
+  orden = ORDEN_NINGUNA;
+
   // maquina de estados: if transiciones else if transiciones else comando hardware
   switch (estado) {
     case INICIAL:
@@ -55,25 +55,25 @@ void estado_loop() {
       else
         estado_siguiente(ABRIENDO_MANUAL);
       break;
-      
+
     case CERRADA:
       apaga();
       break;
-      
+
     case ABRIENDO_AUTOMATICO:
       if (final_carrera_abierta())
         estado_siguiente(ABIERTA_SIN_OCUPAR);
       else
         abre();
       break;
-      
+
     case REABRIENDO_AUTOMATICO:
       if (final_carrera_abierta())
         estado_siguiente(ABIERTA_OCUPADA);
       else
         abre();
       break;
-      
+
     case ABIERTA_SIN_OCUPAR:
       if (obstaculo())
         estado_siguiente(ABIERTA_OCUPADA);
@@ -100,7 +100,7 @@ void estado_loop() {
       break;
 
     case CERRANDO_AUTOMATICO:
-      if (obstaculo()) 
+      if (obstaculo())
         estado_siguiente(REABRIENDO_AUTOMATICO);
       else if (final_carrera_cerrada())
         estado_siguiente(CERRADA);
@@ -114,7 +114,7 @@ void estado_loop() {
       else
         abre();
       break;
-      
+
     case ABIERTA_MANUAL:
       apaga();
       break;
