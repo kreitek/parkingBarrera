@@ -132,11 +132,20 @@ void estado_loop() {
 
     case ABIERTA_MANUAL_OCUPADA:
       client_loop();
-      if (millis() - abierta_manual_millis > ABIERTA_MANUAL_ESPERAR)
+      if (millis() - abierta_manual_millis > ABIERTA_MANUAL_ESPERAR) {
         client_setup();
+        estado_siguiente(ABIERTA_MANUAL_A_LIBERAR);
+      }
       if (!obstaculo())
         estado_siguiente(ABIERTA_MANUAL);
       break;
+
+    case ABIERTA_MANUAL_A_LIBERAR:
+      client_loop();
+      if (!obstaculo())
+        estado_siguiente(ABIERTA_MANUAL);
+      break;
+
 
     case CERRANDO_MANUAL:
       if (obstaculo())
