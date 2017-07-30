@@ -2,6 +2,7 @@
 #include <Ethernet.h>
 #include <uHTTP.h>
 #include "web.h"
+#include "config.h"
 
 
 // Initialize the Ethernet client library
