@@ -8,7 +8,7 @@ EthernetClient client;
 
 void client_setup() {
 
-  client.stop();
+  client_stop();
 
   // give the Ethernet shield a second to initialize:
   delay(1000);
