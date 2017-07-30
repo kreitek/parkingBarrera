@@ -9,3 +9,4 @@ extern const int PORT;
 extern const char* FOLDER;
 extern IPAddress request_server;
 //extern char request_server[];
+extern const String RUTA_REQUEST;

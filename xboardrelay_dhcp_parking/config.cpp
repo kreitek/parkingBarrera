@@ -10,3 +10,4 @@ const int PORT = 80;
 const char* FOLDER = "/api/";
 IPAddress request_server(74, 125, 232, 128);   // numeric IP for Google (no DNS)
 //char request_server[] = "www.google.com";   // name address for Google (using DNS)
+const String RUTA_REQUEST = "/default_request/";

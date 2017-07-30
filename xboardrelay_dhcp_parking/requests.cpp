@@ -18,8 +18,8 @@ void client_setup() {
   if (client.connect(request_server, 80)) {
     Serial.println("connected");
     // Make a HTTP request:
-    client.println("GET /search?q=arduino HTTP/1.1");
-    client.println("Host: www.google.com");
+    String get_request = "GET " + RUTA_REQUEST + " HTTP/1.1";
+    client.println(get_request);
     client.println("Connection: close");
     client.println();
   } else {
