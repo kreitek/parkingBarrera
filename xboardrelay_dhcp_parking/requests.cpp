@@ -7,11 +7,12 @@
 EthernetClient client;
 
 void client_setup() {
+
+  client_stop();
+
   // give the Ethernet shield a second to initialize:
   delay(1000);
   Serial.println("connecting...");
-
-  client_stop();
 
   // if you get a connection, report back via serial:
   if (client.connect(request_server, 80)) {
