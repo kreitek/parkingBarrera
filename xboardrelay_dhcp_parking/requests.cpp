@@ -3,7 +3,7 @@
 
 // if you don't want to use DNS (and reduce your sketch size)
 // use the numeric IP instead of the name for the server:
-IPAddress server(74,125,232,128);  // numeric IP for Google (no DNS)
+IPAddress request_server(74,125,232,128);  // numeric IP for Google (no DNS)
 //char server[] = "www.google.com";    // name address for Google (using DNS)
 
 // Initialize the Ethernet client library
@@ -17,7 +17,7 @@ void client_setup() {
   Serial.println("connecting...");
 
   // if you get a connection, report back via serial:
-  if (client.connect(server, 80)) {
+  if (client.connect(request_server, 80)) {
     Serial.println("connected");
     // Make a HTTP request:
     client.println("GET /search?q=arduino HTTP/1.1");
