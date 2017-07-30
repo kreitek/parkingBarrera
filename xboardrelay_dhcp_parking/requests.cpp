@@ -12,7 +12,7 @@ void client_setup() {
   Serial.println("connecting...");
 
   // if you get a connection, report back via serial:
-  if (client.connect((IPAddress)request_server, 80)) {
+  if (client.connect(request_server, 80)) {
     Serial.println("connected");
     // Make a HTTP request:
     client.println("GET /search?q=arduino HTTP/1.1");
