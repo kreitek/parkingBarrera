@@ -1,8 +1,10 @@
 #include <Arduino.h>
 #include "estados.h"
 #include "hardware.h"
+#include "requests.h"
 
 #define ABIERTA_LIBRE_ESPERAR 3000
+#define ABIERTA_MANUAL_ESPERAR 600
 
 Estado estado = INICIAL;
 Orden orden = ORDEN_NINGUNA;
@@ -10,6 +12,7 @@ Orden ultima_orden = ORDEN_NINGUNA;
 long unsigned int estado_millis = 0;
 long unsigned int ultima_orden_millis = 0;
 long unsigned int abierta_libre_millis = 0;
+long unsigned int abierta_manual_millis = 0;
 
 bool orden_siguiente(Orden siguiente) {
   orden = siguiente;
@@ -109,14 +112,21 @@ void estado_loop() {
       break;
 
     case ABRIENDO_MANUAL:
-      if (final_carrera_abierta())
+      if (final_carrera_abierta()) {
         estado_siguiente(ABIERTA_MANUAL);
+        client_setup();
+      }
       else
         abre();
       break;
 
     case ABIERTA_MANUAL:
       apaga();
+      client_loop();
+      if (obstaculo())
+        abierta_manual_millis = millis();
+      else if (millis() - abierta_manual_millis > ABIERTA_MANUAL_ESPERAR)
+        client_setup();
       break;
 
     case CERRANDO_MANUAL:
