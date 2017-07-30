@@ -8,7 +8,7 @@ EthernetClient client;
 
 void client_setup() {
 
-  client_stop();
+  //client_stop();
 
   // give the Ethernet shield a second to initialize:
   delay(1000);
@@ -31,7 +31,7 @@ void client_setup() {
 void client_loop() {
   // if there are incoming bytes available
   // from the server, read them and print them:
-  if (client.available() && client.connected()) {
+  if (client.available()) {
     char c = client.read();
     Serial.print(c);
   }
