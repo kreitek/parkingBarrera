@@ -30,7 +30,7 @@ void client_setup() {
 void client_loop() {
   // if there are incoming bytes available
   // from the server, read them and print them:
-  if (client.available()) {
+  if (client.available() && client.connected()) {
     char c = client.read();
     Serial.print(c);
   }
