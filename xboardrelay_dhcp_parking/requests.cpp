@@ -8,24 +8,24 @@ EthernetClient client;
 
 void client_setup() {
 
-  //client_stop();
-
   // give the Ethernet shield a second to initialize:
   delay(1000);
   Serial.println("connecting...");
-
-  // if you get a connection, report back via serial:
-  if (client.connect(request_server, 80)) {
-    Serial.println("connected");
-    // Make a HTTP request:
-    String get_request = "GET " + RUTA_REQUEST + " HTTP/1.1";
-    client.println(get_request);
-    client.println("Connection: close");
-    client.println();
-  } else {
-    // if you didn't get a connection to the server:
+  
+  HttpClient http(client, REQUEST_HOST, 80);
+  int err = http.get(REQUEST_QUERY);
+  if (err)
     Serial.println("connection failed");
-  }
+  else
+    Serial.println("connected");
+  int status_code = http.responseStatusCode();
+  if (status_code == 200)
+    Serial.println("OK");
+  else
+    Serial.println("return error code " + status_code);
+  // String body = http.responseBody();
+  http.stop();
+
 }
 
 void client_loop() {

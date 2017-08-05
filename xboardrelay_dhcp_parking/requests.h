@@ -1,5 +1,6 @@
 #include <SPI.h>
 #include <Ethernet.h>
+#include <ArduinoHttpClient.h>
 #include <uHTTP.h>
 #include "web.h"
 #include "config.h"
