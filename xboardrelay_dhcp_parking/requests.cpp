@@ -21,8 +21,11 @@ void client_setup() {
   int status_code = http.responseStatusCode();
   if (status_code == 200)
     Serial.println("OK");
-  else
-    Serial.println("return error code " + status_code);
+  else {
+    Serial.print("return error code ");
+    Serial.println(status_code, DEC);
+  }
+
   // String body = http.responseBody();
   http.stop();
 
