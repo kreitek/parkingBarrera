@@ -3,6 +3,9 @@
 // wget https://github.com/nomadnt/uHTTP/archive/master.zip -O /tmp/uHTTP.zip
 // Hay que instalar bounce2 de
 // wget https://github.com/thomasfredericks/Bounce2/archive/master.zip -O /tmp/bounce2.zip
+// Hay que instalar ArduinoHttpClient de
+// wget https://github.com/arduino-libraries/ArduinoHttpClient/archive/master.zip -O /tmp/ArduinoHttpClient.zip
+
 
 #include <Bounce2.h>
 #include "estados.h"
