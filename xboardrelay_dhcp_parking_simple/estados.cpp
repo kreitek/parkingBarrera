@@ -1,7 +1,6 @@
 #include <Arduino.h>
 #include "estados.h"
 #include "hardware.h"
-#include "requests.h"
 
 #define ABIERTA_LIBRE_ESPERAR 3000
 #define ABIERTA_MANUAL_ESPERAR 600
@@ -47,7 +46,6 @@ void estado_loop() {
     estado_siguiente(ABRIENDO_AUTOMATICO);
   else if (orden == ORDEN_ABRIR_MANUAL) {
     estado_siguiente(ABRIENDO_MANUAL);
-    // client_setup();
   }
   else if (orden == ORDEN_CERRAR)
     estado_siguiente(CERRANDO_MANUAL);
@@ -115,7 +113,6 @@ void estado_loop() {
       break;
 
     case ABRIENDO_MANUAL:
-      // client_loop();
       if (esperar_estado())
         estado_siguiente(ABIERTA_MANUAL);
       else
@@ -124,7 +121,6 @@ void estado_loop() {
 
     case ABIERTA_MANUAL:
       abre();
-      // client_loop();
       if (obstaculo()) {
         abierta_manual_millis = millis();
         estado_siguiente(ABIERTA_MANUAL_OCUPADA);
@@ -132,9 +128,7 @@ void estado_loop() {
       break;
 
     case ABIERTA_MANUAL_OCUPADA:
-      // client_loop();
       if (millis() - abierta_manual_millis > ABIERTA_MANUAL_ESPERAR) {
-        // client_setup();
         estado_siguiente(ABIERTA_MANUAL_A_LIBERAR);
       }
       if (!obstaculo())
@@ -142,7 +136,6 @@ void estado_loop() {
       break;
 
     case ABIERTA_MANUAL_A_LIBERAR:
-      // client_loop();
       if (!obstaculo())
         estado_siguiente(ABIERTA_MANUAL);
       break;
