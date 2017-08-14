@@ -5,6 +5,7 @@
 
 #define ABIERTA_LIBRE_ESPERAR 3000
 #define ABIERTA_MANUAL_ESPERAR 600
+#define ESPERAR_ON 1000
 
 Estado estado = INICIAL;
 Orden orden = ORDEN_NINGUNA;
@@ -25,6 +26,10 @@ bool estado_siguiente(Estado siguiente) {
   estado_millis = millis();
 }
 
+bool esperar_estado() {
+  return (millis() - estado_millis) > ESPERAR_ON;
+}
+
 void estado_loop() {
   // no sobreescribimos orden de la web
   if (orden == ORDEN_NINGUNA) {
@@ -42,7 +47,7 @@ void estado_loop() {
     estado_siguiente(ABRIENDO_AUTOMATICO);
   else if (orden == ORDEN_ABRIR_MANUAL) {
     estado_siguiente(ABRIENDO_MANUAL);
-    client_setup();
+    // client_setup();
   }
   else if (orden == ORDEN_CERRAR)
     estado_siguiente(CERRANDO_MANUAL);
@@ -53,12 +58,8 @@ void estado_loop() {
   // maquina de estados: if transiciones else if transiciones else comando hardware
   switch (estado) {
     case INICIAL:
-      if (final_carrera_cerrada())
-        estado_siguiente(CERRADA);
-      else if (final_carrera_abierta())
-        estado_siguiente(ABIERTA_MANUAL);
-      else
-        estado_siguiente(ABRIENDO_MANUAL);
+      // iniciamos barrera y no hacemos nada
+      apaga();
       break;
 
     case CERRADA:
@@ -66,14 +67,14 @@ void estado_loop() {
       break;
 
     case ABRIENDO_AUTOMATICO:
-      if (final_carrera_abierta())
+      if (esperar_estado())
         estado_siguiente(ABIERTA_SIN_OCUPAR);
       else
         abre();
       break;
 
     case REABRIENDO_AUTOMATICO:
-      if (final_carrera_abierta())
+      if (esperar_estado())
         estado_siguiente(ABIERTA_OCUPADA);
       else
         abre();
@@ -107,23 +108,23 @@ void estado_loop() {
     case CERRANDO_AUTOMATICO:
       if (obstaculo())
         estado_siguiente(REABRIENDO_AUTOMATICO);
-      else if (final_carrera_cerrada())
+      else if (esperar_estado())
         estado_siguiente(CERRADA);
       else
         cierra();
       break;
 
     case ABRIENDO_MANUAL:
-      client_loop();
-      if (final_carrera_abierta())
+      // client_loop();
+      if (esperar_estado())
         estado_siguiente(ABIERTA_MANUAL);
       else
         abre();
       break;
 
     case ABIERTA_MANUAL:
-      apaga();
-      client_loop();
+      abre();
+      // client_loop();
       if (obstaculo()) {
         abierta_manual_millis = millis();
         estado_siguiente(ABIERTA_MANUAL_OCUPADA);
@@ -131,9 +132,9 @@ void estado_loop() {
       break;
 
     case ABIERTA_MANUAL_OCUPADA:
-      client_loop();
+      // client_loop();
       if (millis() - abierta_manual_millis > ABIERTA_MANUAL_ESPERAR) {
-        client_setup();
+        // client_setup();
         estado_siguiente(ABIERTA_MANUAL_A_LIBERAR);
       }
       if (!obstaculo())
@@ -141,7 +142,7 @@ void estado_loop() {
       break;
 
     case ABIERTA_MANUAL_A_LIBERAR:
-      client_loop();
+      // client_loop();
       if (!obstaculo())
         estado_siguiente(ABIERTA_MANUAL);
       break;
@@ -150,7 +151,7 @@ void estado_loop() {
     case CERRANDO_MANUAL:
       if (obstaculo())
         estado_siguiente(ABRIENDO_MANUAL);
-      else if (final_carrera_cerrada())
+      else if (esperar_estado()) 
         estado_siguiente(CERRADA);
       else
         cierra();
