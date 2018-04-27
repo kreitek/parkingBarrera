@@ -243,9 +243,10 @@ void comprueba_coche_paso()
        else
            coche_paso = false;
 */
-    } else
+    } else {
         // Se chequea si hay un exceso de tiempo en espera
-        comprueba_timeout();
+        // comprueba_timeout(); // Desactivado, ahora cierra por señal de lazo
+    }
 
 }
 
