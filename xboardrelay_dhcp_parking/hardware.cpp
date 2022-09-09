@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <Bounce2.h>
 #include "hardware.h"
+#include "config.h"
 
 // pinout PCB
 #define RELE1            8   // D8 rele cable motor que a positivo abriria
@@ -17,7 +18,7 @@ long unsigned int led_millis = 99999999;
 
 // Nota: El equivalente digital de ABRIR_AUTOMATICO y ABRIR_MANUAL (A0 y A1) depende del tipo de arduino (leonardo en este caso)
 
-#define BOUNCE_INTERVAL 5 // milliseconds
+#define BOUNCE_INTERVAL 50 // milliseconds
 Bounce abrir_automatico = Bounce(); 
 Bounce abrir_manual = Bounce(); 
 Bounce cerrar = Bounce(); 
@@ -90,18 +91,28 @@ void led_loop(unsigned int pattern) {
 }
 
 void apaga() {
-  digitalWrite(RELE1, LOW);
-  digitalWrite(RELE2, LOW);
+	if (!holdopen) {
+		digitalWrite(RELE1, LOW);
+		digitalWrite(RELE2, LOW);
+	}
 }
 
 void abre() {
-  digitalWrite(RELE1, HIGH);
-  digitalWrite(RELE2, LOW);
+	if (holdopen) {
+		digitalWrite(RELE1, HIGH);
+	} else {
+		digitalWrite(RELE1, HIGH);
+		digitalWrite(RELE2, LOW);
+	}
 }
 
 void cierra() {
-  digitalWrite(RELE1, LOW);
-  digitalWrite(RELE2, HIGH);
+	if (holdopen) {
+		digitalWrite(RELE1, LOW);
+	} else {
+		digitalWrite(RELE1, LOW);
+		digitalWrite(RELE2, HIGH);
+	}
 }
 
 bool rele1() {

@@ -7,11 +7,8 @@ enum Estado {
   ABIERTA_OCUPADA,
   ABIERTA_LIBRE,
   CERRANDO_AUTOMATICO,
-  ABIERTA_MANUAL,
-  ABIERTA_MANUAL_OCUPADA,
-  ABIERTA_MANUAL_A_LIBERAR,
   ABRIENDO_MANUAL,
-  CERRANDO_MANUAL
+  ABIERTA_MANUAL
 };
 
 enum Orden {
@@ -22,8 +19,9 @@ enum Orden {
 };
 
 void estado_loop();
-bool orden_siguiente(Orden siguiente);
-bool estado_siguiente(Estado siguiente);
+void orden_siguiente(Orden siguiente);
+void estado_siguiente(Estado siguiente);
+bool esta_cerrada();
 unsigned int estado_mask();
 const __FlashStringHelper* EstadoStr();
 const __FlashStringHelper* OrdenStr();

@@ -1,8 +1,8 @@
 #include <Arduino.h>
 #include "estados.h"
 #include "hardware.h"
-#include "requests.h"
 
+#define ABIERTA_SIN_ESPERAR 60000
 #define ABIERTA_LIBRE_ESPERAR 3000
 #define ABIERTA_MANUAL_ESPERAR 600
 
@@ -11,16 +11,16 @@ Orden orden = ORDEN_NINGUNA;
 Orden ultima_orden = ORDEN_NINGUNA;
 long unsigned int estado_millis = 0;
 long unsigned int ultima_orden_millis = 0;
+long unsigned int abierta_sin_millis = 0;
 long unsigned int abierta_libre_millis = 0;
-long unsigned int abierta_manual_millis = 0;
 
-bool orden_siguiente(Orden siguiente) {
+void orden_siguiente(Orden siguiente) {
   orden = siguiente;
   ultima_orden = siguiente;
   ultima_orden_millis = millis();
 }
 
-bool estado_siguiente(Estado siguiente) {
+void estado_siguiente(Estado siguiente) {
   estado = siguiente;
   estado_millis = millis();
 }
@@ -42,10 +42,9 @@ void estado_loop() {
     estado_siguiente(ABRIENDO_AUTOMATICO);
   else if (orden == ORDEN_ABRIR_MANUAL) {
     estado_siguiente(ABRIENDO_MANUAL);
-    client_setup();
   }
   else if (orden == ORDEN_CERRAR)
-    estado_siguiente(CERRANDO_MANUAL);
+    estado_siguiente(CERRANDO_AUTOMATICO);
 
   // atendida
   orden = ORDEN_NINGUNA;
@@ -58,7 +57,7 @@ void estado_loop() {
       else if (final_carrera_abierta())
         estado_siguiente(ABIERTA_MANUAL);
       else
-        estado_siguiente(ABRIENDO_MANUAL);
+        estado_siguiente(CERRANDO_AUTOMATICO);
       break;
 
     case CERRADA:
@@ -66,96 +65,66 @@ void estado_loop() {
       break;
 
     case ABRIENDO_AUTOMATICO:
-      if (final_carrera_abierta())
+      abre();
+      if (final_carrera_abierta()) {
         estado_siguiente(ABIERTA_SIN_OCUPAR);
-      else
-        abre();
+        abierta_sin_millis = millis();
+      }
       break;
 
     case REABRIENDO_AUTOMATICO:
+      abre();
       if (final_carrera_abierta())
         estado_siguiente(ABIERTA_OCUPADA);
-      else
-        abre();
       break;
 
     case ABIERTA_SIN_OCUPAR:
-      if (obstaculo())
+      apaga();
+      if (obstaculo()) {
         estado_siguiente(ABIERTA_OCUPADA);
-      else
-        apaga();
+      } else if (millis() - abierta_sin_millis > ABIERTA_SIN_ESPERAR) {
+        estado_siguiente(CERRANDO_AUTOMATICO);
+      }
       break;
 
     case ABIERTA_OCUPADA:
+      apaga();
       if (!obstaculo()) {
         estado_siguiente(ABIERTA_LIBRE);
         abierta_libre_millis = millis();
-      } else {
-        apaga();
       }
       break;
 
     case ABIERTA_LIBRE:
+      apaga();
       if (obstaculo())
         estado_siguiente(ABIERTA_OCUPADA);
       else if (millis() - abierta_libre_millis > ABIERTA_LIBRE_ESPERAR)
         estado_siguiente(CERRANDO_AUTOMATICO);
-      else
-        apaga();
       break;
 
     case CERRANDO_AUTOMATICO:
+      cierra();
       if (obstaculo())
         estado_siguiente(REABRIENDO_AUTOMATICO);
       else if (final_carrera_cerrada())
         estado_siguiente(CERRADA);
-      else
-        cierra();
       break;
 
     case ABRIENDO_MANUAL:
-      client_loop();
+      abre();
       if (final_carrera_abierta())
         estado_siguiente(ABIERTA_MANUAL);
-      else
-        abre();
       break;
 
     case ABIERTA_MANUAL:
       apaga();
-      client_loop();
-      if (obstaculo()) {
-        abierta_manual_millis = millis();
-        estado_siguiente(ABIERTA_MANUAL_OCUPADA);
-      }
-      break;
-
-    case ABIERTA_MANUAL_OCUPADA:
-      client_loop();
-      if (millis() - abierta_manual_millis > ABIERTA_MANUAL_ESPERAR) {
-        client_setup();
-        estado_siguiente(ABIERTA_MANUAL_A_LIBERAR);
-      }
-      if (!obstaculo())
-        estado_siguiente(ABIERTA_MANUAL);
-      break;
-
-    case ABIERTA_MANUAL_A_LIBERAR:
-      client_loop();
-      if (!obstaculo())
-        estado_siguiente(ABIERTA_MANUAL);
-      break;
-
-
-    case CERRANDO_MANUAL:
-      if (obstaculo())
-        estado_siguiente(ABRIENDO_MANUAL);
-      else if (final_carrera_cerrada())
-        estado_siguiente(CERRADA);
-      else
-        cierra();
       break;
   }
+}
+
+bool esta_cerrada(){
+  return estado == CERRADA;
 }
 
 #define RAYA B0111
@@ -172,10 +141,9 @@ unsigned int estado_mask() {
       case ABIERTA_SIN_OCUPAR:     return MORSE(RAYA, RAYA, PUNTO);
       case ABIERTA_OCUPADA:        return MORSE(RAYA, RAYA, RAYA);
 
-      case ABRIENDO_MANUAL:        return MORSE(PUNTO, PUNTO, RAYA);
-      case ABRIENDO_AUTOMATICO:    return MORSE(PUNTO, RAYA, PUNTO);
+      case ABRIENDO_MANUAL:        return MORSE(PUNTO, PUNTO, PUNTO);
+      case ABRIENDO_AUTOMATICO:    return MORSE(PUNTO, PUNTO, RAYA);
       case REABRIENDO_AUTOMATICO:  return MORSE(PUNTO, RAYA, PUNTO);
-      case CERRANDO_MANUAL:        return MORSE(PUNTO, RAYA, RAYA);
       case CERRANDO_AUTOMATICO:    return MORSE(PUNTO, RAYA, RAYA);
       default:                     return 0;
   }
@@ -193,7 +161,6 @@ const __FlashStringHelper* EstadoStr() {
         case CERRANDO_AUTOMATICO:    return F("Cerrando automático");
         case ABIERTA_MANUAL:         return F("Abierta manual");
         case ABRIENDO_MANUAL:        return F("Abriendo manual");
-        case CERRANDO_MANUAL:        return F("Cerrando manual");
         default:                     return F("[Unknown]");
     }
 }

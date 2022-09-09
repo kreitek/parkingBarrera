@@ -9,7 +9,7 @@ EthernetClient client;
 void client_setup() {
 
   // give the Ethernet shield a second to initialize:
-  delay(1000);
+  // delay(1000);
   Serial.println("connecting...");
   
   HttpClient http(client, REQUEST_HOST, 80);

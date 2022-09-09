@@ -131,7 +131,7 @@ void webpage_form(EthernetClient &client) {
     "<form method=POST>" \
     "<div>" \
     "  <input type=submit name=abrir_cerrar value=\"abrir automatico\">" \
-    "  <input type=submit name=abrir value=\"abrir siempre\">" \
+    "  <input type=submit name=abrir_siempre value=\"abrir siempre\">" \
     "  <input type=submit name=cerrar value=\"cerrar\">" \
     "</div>" \
     "<div>Password <input type=password name=key></div>" \
@@ -221,10 +221,6 @@ void serial_print_connect() {
   Serial.print(millis());
   Serial.print(F("] \""));
   Serial.print(server.uri());
-  if (server.query()) {
-    Serial.print(F("?"));
-    Serial.print(server.query());
-  }
   Serial.print(F("\""));
 }
 
