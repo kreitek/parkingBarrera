@@ -23,6 +23,10 @@ void orden_siguiente(Orden siguiente) {
 void estado_siguiente(Estado siguiente) {
   estado = siguiente;
   estado_millis = millis();
+  if (siguiente == ABRIENDO_MANUAL || 
+      siguiente == CERRANDO_AUTOMATICO || 
+      siguiente == ABRIENDO_AUTOMATICO) 
+	toggle();
 }
 
 void estado_loop() {
@@ -38,12 +42,11 @@ void estado_loop() {
   }
 
   // atendiendo orden de boton (o de web)
-  if (orden == ORDEN_ABRIR_AUTOMATICO)
+  if (orden == ORDEN_ABRIR_AUTOMATICO and not final_carrera_abierta())
     estado_siguiente(ABRIENDO_AUTOMATICO);
-  else if (orden == ORDEN_ABRIR_MANUAL) {
+  else if (orden == ORDEN_ABRIR_MANUAL and not final_carrera_abierta()) 
     estado_siguiente(ABRIENDO_MANUAL);
-  }
-  else if (orden == ORDEN_CERRAR)
+  else if (orden == ORDEN_CERRAR and not final_carrera_cerrada())
     estado_siguiente(CERRANDO_AUTOMATICO);
 
   // atendida
@@ -61,25 +64,18 @@ void estado_loop() {
       break;
 
     case CERRADA:
-      apaga();
       break;
 
     case ABRIENDO_AUTOMATICO:
-      abre();
       if (final_carrera_abierta()) {
         estado_siguiente(ABIERTA_SIN_OCUPAR);
         abierta_sin_millis = millis();
+      } else if (final_carrera_cerrada()) {
+        estado_siguiente(ABRIENDO_AUTOMATICO);
       }
       break;
 
-    case REABRIENDO_AUTOMATICO:
-      abre();
-      if (final_carrera_abierta())
-        estado_siguiente(ABIERTA_OCUPADA);
-      break;
-
     case ABIERTA_SIN_OCUPAR:
-      apaga();
       if (obstaculo()) {
         estado_siguiente(ABIERTA_OCUPADA);
       } else if (millis() - abierta_sin_millis > ABIERTA_SIN_ESPERAR) {
@@ -88,7 +84,6 @@ void estado_loop() {
       break;
 
     case ABIERTA_OCUPADA:
-      apaga();
       if (!obstaculo()) {
         estado_siguiente(ABIERTA_LIBRE);
         abierta_libre_millis = millis();
@@ -96,7 +91,6 @@ void estado_loop() {
       break;
 
     case ABIERTA_LIBRE:
-      apaga();
       if (obstaculo())
         estado_siguiente(ABIERTA_OCUPADA);
       else if (millis() - abierta_libre_millis > ABIERTA_LIBRE_ESPERAR)
@@ -104,21 +98,20 @@ void estado_loop() {
       break;
 
     case CERRANDO_AUTOMATICO:
-      cierra();
-      if (obstaculo())
-        estado_siguiente(REABRIENDO_AUTOMATICO);
-      else if (final_carrera_cerrada())
+      if (final_carrera_cerrada())
         estado_siguiente(CERRADA);
+      else if (final_carrera_abierta())
+        estado_siguiente(ABIERTA_OCUPADA);
       break;
 
     case ABRIENDO_MANUAL:
-      abre();
       if (final_carrera_abierta())
         estado_siguiente(ABIERTA_MANUAL);
+      else if (final_carrera_cerrada())
+        estado_siguiente(ABRIENDO_MANUAL);
       break;
 
     case ABIERTA_MANUAL:
-      apaga();
       break;
   }
 }
@@ -143,7 +136,6 @@ unsigned int estado_mask() {
 
       case ABRIENDO_MANUAL:        return MORSE(PUNTO, PUNTO, PUNTO);
       case ABRIENDO_AUTOMATICO:    return MORSE(PUNTO, PUNTO, RAYA);
-      case REABRIENDO_AUTOMATICO:  return MORSE(PUNTO, RAYA, PUNTO);
       case CERRANDO_AUTOMATICO:    return MORSE(PUNTO, RAYA, RAYA);
       default:                     return 0;
   }
@@ -154,7 +146,6 @@ const __FlashStringHelper* EstadoStr() {
         case INICIAL:                return F("Inicial");
         case CERRADA:                return F("Cerrada");
         case ABRIENDO_AUTOMATICO:    return F("Abriendo automatico");
-        case REABRIENDO_AUTOMATICO:  return F("Reabriendo automatico");
         case ABIERTA_SIN_OCUPAR:     return F("Abierta sin ocupar");
         case ABIERTA_OCUPADA:        return F("Abierta ocupada");
         case ABIERTA_LIBRE:          return F("Abierta libre");

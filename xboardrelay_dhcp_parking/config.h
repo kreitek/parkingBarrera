@@ -10,4 +10,3 @@ extern const char* FOLDER;
 extern const char* REQUEST_HOST;
 extern const char* REQUEST_QUERY;
 extern const unsigned int FRECUENCIA_TEST_SERVIDOR;
-extern const bool holdopen;

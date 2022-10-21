@@ -90,29 +90,11 @@ void led_loop(unsigned int pattern) {
   }
 }
 
-void apaga() {
-	if (!holdopen) {
-		digitalWrite(RELE1, LOW);
-		digitalWrite(RELE2, LOW);
-	}
-}
-
-void abre() {
-	if (holdopen) {
-		digitalWrite(RELE1, HIGH);
-	} else {
-		digitalWrite(RELE1, HIGH);
-		digitalWrite(RELE2, LOW);
-	}
-}
-
-void cierra() {
-	if (holdopen) {
-		digitalWrite(RELE1, LOW);
-	} else {
-		digitalWrite(RELE1, LOW);
-		digitalWrite(RELE2, HIGH);
-	}
+void toggle() {
+    digitalWrite(RELE1, HIGH);
+    delay(100);
+    digitalWrite(RELE1, LOW);
+    delay(100);
 }
 
 bool rele1() {

@@ -76,7 +76,6 @@ void loop() {
 
   wdtLoop();
   if (esta_cerrada() && !hayConexion(client)){
-    apaga();
     systemReboot();
   }
 }

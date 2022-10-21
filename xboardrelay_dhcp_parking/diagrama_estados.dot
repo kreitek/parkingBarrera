@@ -6,39 +6,37 @@ digraph G {
         boton_abrir_automatico [shape=parallelogram color=blue]
         boton_abrir_manual [shape=parallelogram color=blue]
         abriendo_automatico [shape=box color=green]
-        reabriendo_automatico [shape=box color=green]
         abriendo_manual [shape=box color=green]
-        abierta_manual [shape=box color=yellow]
-        abierta_libre [shape=box color=yellow]
-        abierta_ocupada [shape=box color=yellow]
-        abierta_sin_ocupar [shape=box color=yellow]
-        cerrando_automatico [shape=box color=red]
-        cerrada [shape=box color=orange]
-        "open=1 | close=0 | hold=1" [shape=box color=green]
-        "open=0 | close=0 | hold=1" [shape=box color=yellow]
-        "open=0 | close=1 | hold=0" [shape=box color=red]
-        "open=0 | close=0 | hold=0" [shape=box color=orange]
+        abierta_manual [shape=box color=black]
+        abierta_libre [shape=box color=black]
+        abierta_ocupada [shape=box color=black]
+        abierta_sin_ocupar [shape=box color=black]
+        cerrando_automatico [shape=box color=green]
+        cerrada [shape=box color=black]
+        "toggle=1" [shape=box color=green]
+        "toggle=0" [shape=box color=black]
     }
 
     boton_cerrar_automatico -> cerrando_automatico
     boton_abrir_automatico -> abriendo_automatico
-    boton_abrir_manual -> abriendo_manual
+    boton_abrir_automatico -> abierta_sin_ocupar [label="fca"]
+    boton_abrir_manual -> abriendo_manual [label="no fca"]
+    abriendo_manual -> abriendo_manual [label="fcc"]
+    boton_abrir_manual -> abierta_manual [label="fca"]
 
     inicial -> cerrada [label="fcc"]
     inicial -> abierta_manual [label="fca"]
     inicial -> cerrando_automatico [label="ni fcc ni fca"]
     abriendo_automatico -> abierta_sin_ocupar [label="fca"]
-    reabriendo_automatico -> abierta_ocupada [label="fca"]
+    abriendo_automatico -> abriendo_automatico [label="fcc"]
     abierta_sin_ocupar -> abierta_ocupada [label="obstaculo"]
     abierta_sin_ocupar -> cerrando_automatico [label="t2"]
     abierta_ocupada -> abierta_libre [label="no obstaculo"]
     abierta_libre -> abierta_ocupada [label="obstaculo"]
     abierta_libre -> cerrando_automatico [label="t1"]
-    cerrando_automatico -> reabriendo_automatico [label="obstaculo"]
     cerrando_automatico -> cerrada [label="fcc"]
+    cerrando_automatico -> abierta_ocupada [label="fca"]
     abriendo_manual -> abierta_manual [label="fca"]
 
-    "open=1 | close=0 | hold=1" -> "open=0 | close=0 | hold=1"
-    "open=0 | close=0 | hold=1" -> "open=0 | close=1 | hold=0"
-    "open=0 | close=1 | hold=0" -> "open=0 | close=0 | hold=0"
+	"toggle=0" -> "toggle=1"
 }

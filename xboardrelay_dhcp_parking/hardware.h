@@ -11,9 +11,7 @@
 void hardware_setup();
 void hardware_loop();
 void led_loop(unsigned int pattern);
-void apaga();
-void cierra();
-void abre();
+void toggle();
 bool rele1();
 bool rele2();
 bool obstaculo();

@@ -11,4 +11,3 @@ const char* FOLDER = "/api/";
 const char* REQUEST_HOST = "192.168.1.10";   // numeric IP (no DNS)
 const char* REQUEST_QUERY = "/parker/barrera_alive/";
 const unsigned int FRECUENCIA_TEST_SERVIDOR = 30000;
-const bool holdopen = false;  // esto es para las barreras que necesitan unicamente señal de open "mantenida"
