@@ -7,6 +7,7 @@ extern uHTTP server;
 void web_setup();
 void webpage_form(EthernetClient &client);
 void redirect(EthernetClient &client, String uri);
+void http_response(EthernetClient &client, String message);
 void unauthorized(EthernetClient &client);
 void not_found(EthernetClient &client);
 void error(EthernetClient &client);

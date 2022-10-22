@@ -17,9 +17,9 @@
 
 
 void setup() {
-  Serial.begin(57600);
+  Serial.begin(115200);
   // while (!Serial) /* wait for serial chip */;
-  if (Serial) Serial.println("Iniciando...");
+  if (Serial) Serial.println("start setup()");
   wdtLoop();
   hardware_setup();
   web_setup();
@@ -28,12 +28,13 @@ void setup() {
   ethernet_loop(); // para renovar el dhcp lease cuando toque
   wdtLoop();
   delay(2000);
-  if (Serial) Serial.println("loop...");
+  if (Serial) Serial.println("end setup()");
 }
 
 void loop() {
   EthernetClient client = server.available();
   if (client) {
+    cronometraConexion();
     serial_print_connect();
     //serial_print_localip();
 
@@ -55,6 +56,9 @@ void loop() {
           } else if (server.data("cerrar")) {
             orden_siguiente(ORDEN_CERRAR);
             redirect(client, FOLDER);
+          } else if (server.data("reboot")) {
+            http_response(client, F("Reiniciando"));
+			systemReboot();
           } else {
             error(client);
           }
@@ -72,7 +76,6 @@ void loop() {
   hardware_loop(); // para renovar los bounces
   ethernet_loop(); // para renovar el dhcp lease cuando toque
   estado_loop(); // para chequear sensores y ejecutar maquina de estados
-  led_loop(estado_mask()); // para hacer el parpadeo del led
 
   wdtLoop();
   if (esta_cerrada() && !hayConexion(client)){
@@ -95,11 +98,16 @@ void systemReboot(){
   }
 }
 
+unsigned long proximo = T_TEST_SERVIDOR * 1000UL;
+
+void cronometraConexion() {
+  proximo = millis() + T_TEST_SERVIDOR * 1000UL;
+}
+
 bool hayConexion(EthernetClient &client){
-  static unsigned long proximo = FRECUENCIA_TEST_SERVIDOR;  // la primera al cabo de varios segundos
   if (millis() < proximo)
     return true;
-  proximo = millis() + FRECUENCIA_TEST_SERVIDOR;
+  cronometraConexion();
   // close any connection before send a new request.
   // This will free the socket on the WiFi shield
   client.stop();

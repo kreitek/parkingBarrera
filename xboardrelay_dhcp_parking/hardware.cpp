@@ -4,15 +4,13 @@
 #include "config.h"
 
 // pinout PCB
-#define RELE1            8   // D8 rele cable motor que a positivo abriria
-#define RELE2            7   // D7 rele cable motor que a negativo abriria
+#define RELE             8   // 8=D8 rele1 y 7=D7 rele2
 #define ABRIR_AUTOMATICO A0   // A0 boton que a 0V abre en modo automatico
 #define ABRIR_MANUAL     A1   // A1 boton que a 0V abre en modo manual
 #define CERRAR           4   // D4 boton que a 0V cierra
 #define LUX              5   // D5 fotocelula que a 0V significa que algo está cortando el haz
 #define FCA              2   // D2 fin carrera abierta con pullup que a 0V significa que llegó al final
 #define FCC              3   // D3 fin carrera cerrada con pullup que a 0V significa que llegó al final
-#define LED              13  // Se asume que el led es logica directa, con resistencia a 0V
 
 long unsigned int led_millis = 99999999;
 
@@ -28,9 +26,7 @@ Bounce fcc = Bounce();
 
 void hardware_setup() {
   // salidas
-  pinMode(LED, OUTPUT);
-  pinMode(RELE1, OUTPUT);
-  pinMode(RELE2, OUTPUT);
+  pinMode(RELE, OUTPUT);
 
   // entradas, con pullup y bounce2
   pinMode(ABRIR_AUTOMATICO, INPUT_PULLUP);
@@ -67,42 +63,12 @@ void hardware_loop() {
   fcc.update();
 }
 
-void led_on() {
-  digitalWrite(LED, HIGH);
-}
-
-void led_off() {
-  digitalWrite(LED, LOW);
-}
-
-void led_loop(unsigned int pattern) {
-  // el pattern son 16 bits y vamos a definir que 4 bits son 1 segundo
-  static unsigned int mask = 0x8000;
-  if (millis() - led_millis > 250) {
-    if (mask & pattern) 
-      led_on();
-    else
-      led_off();
-    mask = mask >> 1;
-    if (!mask)
-      mask = 0x8000;
-    led_millis = millis();
-  }
-}
-
 void toggle() {
-    digitalWrite(RELE1, HIGH);
+    if (Serial) Serial.println("Pulso rele");
+    digitalWrite(RELE, HIGH);
     delay(100);
-    digitalWrite(RELE1, LOW);
+    digitalWrite(RELE, LOW);
     delay(100);
-}
-
-bool rele1() {
-  return digitalRead(RELE1) == HIGH;
-}
-
-bool rele2() {
-  return digitalRead(RELE2) == HIGH;
 }
 
 bool obstaculo() {

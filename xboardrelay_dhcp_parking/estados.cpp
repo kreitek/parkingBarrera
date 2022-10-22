@@ -1,31 +1,37 @@
 #include <Arduino.h>
+#include "config.h"
 #include "estados.h"
 #include "hardware.h"
 
-#define ABIERTA_SIN_ESPERAR 60000
-#define ABIERTA_LIBRE_ESPERAR 3000
-#define ABIERTA_MANUAL_ESPERAR 600
-
 Estado estado = INICIAL;
+bool automatica = true;
 Orden orden = ORDEN_NINGUNA;
 Orden ultima_orden = ORDEN_NINGUNA;
 long unsigned int estado_millis = 0;
 long unsigned int ultima_orden_millis = 0;
-long unsigned int abierta_sin_millis = 0;
-long unsigned int abierta_libre_millis = 0;
+
+unsigned int tiempo_en_estado() {
+	return (millis() - estado_millis) / 1000;
+}
 
 void orden_siguiente(Orden siguiente) {
   orden = siguiente;
   ultima_orden = siguiente;
   ultima_orden_millis = millis();
+  automatica = (siguiente != ORDEN_ABRIR_MANUAL);
+  if (Serial) { Serial.print("orden="); Serial.println(OrdenStr()); }
 }
 
 void estado_siguiente(Estado siguiente) {
   estado = siguiente;
   estado_millis = millis();
-  if (siguiente == ABRIENDO_MANUAL || 
-      siguiente == CERRANDO_AUTOMATICO || 
-      siguiente == ABRIENDO_AUTOMATICO) 
+  if (Serial) { 
+	Serial.print("estado="); 
+    Serial.print(EstadoStr()); 
+	Serial.print(" automatica="); 
+    Serial.println(automatica); 
+  }
+  if (siguiente == ABRIENDO_PULSO || siguiente == CERRANDO_PULSO)
 	toggle();
 }
 
@@ -43,11 +49,11 @@ void estado_loop() {
 
   // atendiendo orden de boton (o de web)
   if (orden == ORDEN_ABRIR_AUTOMATICO and not final_carrera_abierta())
-    estado_siguiente(ABRIENDO_AUTOMATICO);
+    estado_siguiente(ABRIENDO);
   else if (orden == ORDEN_ABRIR_MANUAL and not final_carrera_abierta()) 
-    estado_siguiente(ABRIENDO_MANUAL);
+    estado_siguiente(ABRIENDO);
   else if (orden == ORDEN_CERRAR and not final_carrera_cerrada())
-    estado_siguiente(CERRANDO_AUTOMATICO);
+    estado_siguiente(CERRANDO);
 
   // atendida
   orden = ORDEN_NINGUNA;
@@ -58,60 +64,66 @@ void estado_loop() {
       if (final_carrera_cerrada())
         estado_siguiente(CERRADA);
       else if (final_carrera_abierta())
-        estado_siguiente(ABIERTA_MANUAL);
+        estado_siguiente(ABIERTA);
       else
-        estado_siguiente(CERRANDO_AUTOMATICO);
+        estado_siguiente(CERRANDO_PULSO);
       break;
 
     case CERRADA:
       break;
 
-    case ABRIENDO_AUTOMATICO:
-      if (final_carrera_abierta()) {
-        estado_siguiente(ABIERTA_SIN_OCUPAR);
-        abierta_sin_millis = millis();
-      } else if (final_carrera_cerrada()) {
-        estado_siguiente(ABRIENDO_AUTOMATICO);
-      }
+    case ABRIENDO_PULSO:
+	  if (!final_carrera_abierta() && !final_carrera_cerrada())
+        estado_siguiente(ABRIENDO);
+      else if (tiempo_en_estado() > T_REINTENTA_SIN_FC)
+        estado_siguiente(ABRIENDO_PULSO);
       break;
 
-    case ABIERTA_SIN_OCUPAR:
-      if (obstaculo()) {
+    case ABRIENDO:
+      if (final_carrera_abierta())
+        estado_siguiente(ABIERTA);
+      else if (final_carrera_cerrada())
+        estado_siguiente(ABRIENDO_PULSO);
+      else if (tiempo_en_estado() > T_REINTENTA_CON_FC)
+        estado_siguiente(ABRIENDO_PULSO);
+      break;
+
+    case ABIERTA:
+      if (automatica && obstaculo())
         estado_siguiente(ABIERTA_OCUPADA);
-      } else if (millis() - abierta_sin_millis > ABIERTA_SIN_ESPERAR) {
-        estado_siguiente(CERRANDO_AUTOMATICO);
-      }
+      else if (automatica && tiempo_en_estado() > T_ABIERTA_SIN_ESPERAR)
+        estado_siguiente(CERRANDO_PULSO);
       break;
 
     case ABIERTA_OCUPADA:
-      if (!obstaculo()) {
+      if (!automatica && !obstaculo()) {
+        estado_siguiente(ABIERTA);
+      } else if (automatica && !obstaculo()) {
         estado_siguiente(ABIERTA_LIBRE);
-        abierta_libre_millis = millis();
       }
       break;
 
     case ABIERTA_LIBRE:
       if (obstaculo())
         estado_siguiente(ABIERTA_OCUPADA);
-      else if (millis() - abierta_libre_millis > ABIERTA_LIBRE_ESPERAR)
-        estado_siguiente(CERRANDO_AUTOMATICO);
+      else if (tiempo_en_estado() > T_ABIERTA_LIBRE_ESPERAR)
+        estado_siguiente(CERRANDO_PULSO);
       break;
 
-    case CERRANDO_AUTOMATICO:
+    case CERRANDO_PULSO:
+	  if (!final_carrera_abierta() && !final_carrera_cerrada())
+        estado_siguiente(CERRANDO);
+      else if (tiempo_en_estado() > T_REINTENTA_SIN_FC)
+        estado_siguiente(CERRANDO_PULSO);
+      break;
+
+    case CERRANDO:
       if (final_carrera_cerrada())
         estado_siguiente(CERRADA);
       else if (final_carrera_abierta())
         estado_siguiente(ABIERTA_OCUPADA);
-      break;
-
-    case ABRIENDO_MANUAL:
-      if (final_carrera_abierta())
-        estado_siguiente(ABIERTA_MANUAL);
-      else if (final_carrera_cerrada())
-        estado_siguiente(ABRIENDO_MANUAL);
-      break;
-
-    case ABIERTA_MANUAL:
+      else if (tiempo_en_estado() > T_REINTENTA_CON_FC)
+        estado_siguiente(CERRANDO_PULSO);
       break;
   }
 }
@@ -120,38 +132,17 @@ bool esta_cerrada(){
   return estado == CERRADA;
 }
 
-#define RAYA B0111
-#define PUNTO B0010
-#define MORSE(x, y, z) ((x*256) + (y*16) + z)
-
-unsigned int estado_mask() {
-  switch (estado) {
-      case INICIAL:                return 0xff00;
-      case CERRADA:                return MORSE(PUNTO, PUNTO, PUNTO);
-
-      case ABIERTA_MANUAL:         return MORSE(RAYA, PUNTO, PUNTO);
-      case ABIERTA_LIBRE:          return MORSE(RAYA, PUNTO, RAYA);
-      case ABIERTA_SIN_OCUPAR:     return MORSE(RAYA, RAYA, PUNTO);
-      case ABIERTA_OCUPADA:        return MORSE(RAYA, RAYA, RAYA);
-
-      case ABRIENDO_MANUAL:        return MORSE(PUNTO, PUNTO, PUNTO);
-      case ABRIENDO_AUTOMATICO:    return MORSE(PUNTO, PUNTO, RAYA);
-      case CERRANDO_AUTOMATICO:    return MORSE(PUNTO, RAYA, RAYA);
-      default:                     return 0;
-  }
-}
-
 const __FlashStringHelper* EstadoStr() {
     switch (estado) {
         case INICIAL:                return F("Inicial");
         case CERRADA:                return F("Cerrada");
-        case ABRIENDO_AUTOMATICO:    return F("Abriendo automatico");
-        case ABIERTA_SIN_OCUPAR:     return F("Abierta sin ocupar");
+        case ABRIENDO_PULSO:    	 return F("Pulso apertura");
+        case ABRIENDO:    			 return F("Abriendo");
+        case ABIERTA:                return F("Abierta");
         case ABIERTA_OCUPADA:        return F("Abierta ocupada");
         case ABIERTA_LIBRE:          return F("Abierta libre");
-        case CERRANDO_AUTOMATICO:    return F("Cerrando automático");
-        case ABIERTA_MANUAL:         return F("Abierta manual");
-        case ABRIENDO_MANUAL:        return F("Abriendo manual");
+        case CERRANDO_PULSO:    	 return F("Pulso cierre");
+        case CERRANDO:    			 return F("Cerrando");
         default:                     return F("[Unknown]");
     }
 }

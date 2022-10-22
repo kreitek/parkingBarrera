@@ -10,10 +10,7 @@
 
 void hardware_setup();
 void hardware_loop();
-void led_loop(unsigned int pattern);
 void toggle();
-bool rele1();
-bool rele2();
 bool obstaculo();
 bool final_carrera_abierta();
 bool final_carrera_cerrada();

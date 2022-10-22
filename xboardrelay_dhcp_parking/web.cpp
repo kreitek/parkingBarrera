@@ -61,6 +61,10 @@ void webpage_form(EthernetClient &client) {
   web_time(client, estado_millis);
   client.print(F("</li>"));
 
+  client.print(F("<li>Automatica: "));
+  client.print(automatica);
+  client.print(F("</li>"));
+
   client.print(F("<li>Ultima orden: "));
   client.print(OrdenStr());
   client.print(F(" hace "));
@@ -77,20 +81,6 @@ void webpage_form(EthernetClient &client) {
     client.print(MAC[i]%16, HEX);
     client.print(i==5 ? F("</li>") : F(":"));
   }
-
-  client.print(F("</ul>"));
-
-  client.print(F("<h2>Outputs</h2>"));
-
-  client.print(F("<ul>"));
-
-  client.print(F("<li>D7 Rele1 (abrir): "));
-  client.print(rele1());
-  client.print(F("</li>"));
-
-  client.print(F("<li>D8 Rele2 (cerrar): "));
-  client.print(rele2());
-  client.print(F("</li>"));
 
   client.print(F("</ul>"));
 
@@ -133,6 +123,7 @@ void webpage_form(EthernetClient &client) {
     "  <input type=submit name=abrir_cerrar value=\"abrir automatico\">" \
     "  <input type=submit name=abrir_siempre value=\"abrir siempre\">" \
     "  <input type=submit name=cerrar value=\"cerrar\">" \
+    "  <input type=submit name=reboot value=\"reboot\">" \
     "</div>" \
     "<div>Password <input type=password name=key></div>" \
     "</form>"));
