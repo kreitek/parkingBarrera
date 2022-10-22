@@ -84,6 +84,30 @@ void webpage_form(EthernetClient &client) {
 
   client.print(F("</ul>"));
 
+  client.print(F("<h2>Config</h2>"));
+  client.print(F("<ul>"));
+  client.print(F("<li>T test servidor: "));
+  client.print(T_TEST_SERVIDOR);
+  client.print(F("</li>"));
+
+  client.print(F("<li>T abierta sin esperar: "));
+  client.print(T_ABIERTA_SIN_ESPERAR);
+  client.print(F("</li>"));
+
+  client.print(F("<li>T abierta libre esperar: "));
+  client.print(T_ABIERTA_LIBRE_ESPERAR);
+  client.print(F("</li>"));
+
+  client.print(F("<li>T reintenta sin fc: "));
+  client.print(T_REINTENTA_SIN_FC);
+  client.print(F("</li>"));
+
+  client.print(F("<li>T reintenta con fc: "));
+  client.print(T_REINTENTA_CON_FC);
+  client.print(F("</li>"));
+
+  client.print(F("</ul>"));
+
   client.print(F("<h2>Inputs</h2>"));
 
   client.print(F("<ul>"));
@@ -124,6 +148,7 @@ void webpage_form(EthernetClient &client) {
     "  <input type=submit name=abrir_siempre value=\"abrir siempre\">" \
     "  <input type=submit name=cerrar value=\"cerrar\">" \
     "  <input type=submit name=reboot value=\"reboot\">" \
+    "  <input type=submit name=key value=\"keyval\">" \
     "</div>" \
     "<div>Password <input type=password name=key></div>" \
     "</form>"));
@@ -208,9 +233,7 @@ void ethernet_ip_setup() {
 }
 
 void serial_print_connect() {
-  Serial.print(F("["));
-  Serial.print(millis());
-  Serial.print(F("] \""));
+  Serial.print(F("http \""));
   Serial.print(server.uri());
   Serial.print(F("\""));
 }

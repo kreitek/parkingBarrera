@@ -75,7 +75,7 @@ void estado_loop() {
     case ABRIENDO_PULSO:
 	  if (!final_carrera_abierta() && !final_carrera_cerrada())
         estado_siguiente(ABRIENDO);
-      else if (tiempo_en_estado() > T_REINTENTA_SIN_FC)
+      else if (T_REINTENTA_SIN_FC && tiempo_en_estado() > T_REINTENTA_SIN_FC)
         estado_siguiente(ABRIENDO_PULSO);
       break;
 
@@ -84,14 +84,14 @@ void estado_loop() {
         estado_siguiente(ABIERTA);
       else if (final_carrera_cerrada())
         estado_siguiente(ABRIENDO_PULSO);
-      else if (tiempo_en_estado() > T_REINTENTA_CON_FC)
+      else if (T_REINTENTA_CON_FC && tiempo_en_estado() > T_REINTENTA_CON_FC)
         estado_siguiente(ABRIENDO_PULSO);
       break;
 
     case ABIERTA:
       if (automatica && obstaculo())
         estado_siguiente(ABIERTA_OCUPADA);
-      else if (automatica && tiempo_en_estado() > T_ABIERTA_SIN_ESPERAR)
+      else if (automatica && T_ABIERTA_SIN_ESPERAR && tiempo_en_estado() > T_ABIERTA_SIN_ESPERAR)
         estado_siguiente(CERRANDO_PULSO);
       break;
 
@@ -106,14 +106,14 @@ void estado_loop() {
     case ABIERTA_LIBRE:
       if (obstaculo())
         estado_siguiente(ABIERTA_OCUPADA);
-      else if (tiempo_en_estado() > T_ABIERTA_LIBRE_ESPERAR)
+      else if (T_ABIERTA_LIBRE_ESPERAR && tiempo_en_estado() > T_ABIERTA_LIBRE_ESPERAR)
         estado_siguiente(CERRANDO_PULSO);
       break;
 
     case CERRANDO_PULSO:
 	  if (!final_carrera_abierta() && !final_carrera_cerrada())
         estado_siguiente(CERRANDO);
-      else if (tiempo_en_estado() > T_REINTENTA_SIN_FC)
+      else if (T_REINTENTA_SIN_FC && tiempo_en_estado() > T_REINTENTA_SIN_FC)
         estado_siguiente(CERRANDO_PULSO);
       break;
 
@@ -121,8 +121,8 @@ void estado_loop() {
       if (final_carrera_cerrada())
         estado_siguiente(CERRADA);
       else if (final_carrera_abierta())
-        estado_siguiente(ABIERTA_OCUPADA);
-      else if (tiempo_en_estado() > T_REINTENTA_CON_FC)
+        estado_siguiente(CERRANDO_PULSO);
+      else if (T_REINTENTA_CON_FC && tiempo_en_estado() > T_REINTENTA_CON_FC)
         estado_siguiente(CERRANDO_PULSO);
       break;
   }

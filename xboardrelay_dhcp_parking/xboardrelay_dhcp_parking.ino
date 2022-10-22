@@ -21,6 +21,7 @@ void setup() {
   // while (!Serial) /* wait for serial chip */;
   if (Serial) Serial.println("start setup()");
   wdtLoop();
+  config_read();
   hardware_setup();
   web_setup();
   wdtLoop();
@@ -59,6 +60,27 @@ void loop() {
           } else if (server.data("reboot")) {
             http_response(client, F("Reiniciando"));
 			systemReboot();
+          } else if (server.data("tts")) {
+            T_TEST_SERVIDOR = atoi(server.data("tts"));
+            redirect(client, FOLDER);
+          } else if (server.data("tase")) {
+            T_ABIERTA_SIN_ESPERAR = atoi(server.data("tase"));
+            redirect(client, FOLDER);
+          } else if (server.data("tale")) {
+            T_ABIERTA_LIBRE_ESPERAR = atoi(server.data("tale"));
+            redirect(client, FOLDER);
+          } else if (server.data("trsf")) {
+            T_REINTENTA_SIN_FC = atoi(server.data("trsf"));
+            redirect(client, FOLDER);
+          } else if (server.data("trcf")) {
+            T_REINTENTA_CON_FC = atoi(server.data("trcf"));
+            redirect(client, FOLDER);
+          } else if (server.data("read")) {
+            config_read();
+            redirect(client, FOLDER);
+          } else if (server.data("write")) {
+            config_write();
+            redirect(client, FOLDER);
           } else {
             error(client);
           }
@@ -105,7 +127,7 @@ void cronometraConexion() {
 }
 
 bool hayConexion(EthernetClient &client){
-  if (millis() < proximo)
+  if (T_TEST_SERVIDOR == 0 || millis() < proximo)
     return true;
   cronometraConexion();
   // close any connection before send a new request.
