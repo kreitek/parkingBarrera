@@ -4,7 +4,7 @@
 #include "config.h"
 
 // pinout PCB
-#define RELE             8   // 8=D8 rele1 y 7=D7 rele2
+#define RELE             7   // 8=D8 rele1 y 7=D7 rele2
 #define ABRIR_AUTOMATICO A0   // A0 boton que a 0V abre en modo automatico
 #define ABRIR_MANUAL     A1   // A1 boton que a 0V abre en modo manual
 #define CERRAR           4   // D4 boton que a 0V cierra
@@ -66,9 +66,9 @@ void hardware_loop() {
 void toggle() {
     if (Serial) Serial.println("Pulso rele");
     digitalWrite(RELE, HIGH);
-    delay(100);
+    delay(300);
     digitalWrite(RELE, LOW);
-    delay(100);
+    delay(300);
 }
 
 bool obstaculo() {

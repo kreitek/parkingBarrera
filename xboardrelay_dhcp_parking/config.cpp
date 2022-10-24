@@ -14,9 +14,9 @@ byte IP[4] = {0, 0, 0, 0};
 const int PORT = 80;
 const char* FOLDER = "/api/";
 const char* REQUEST_QUERY = "/parker/barrera_alive/";
-unsigned int T_TEST_SERVIDOR = 30;
+unsigned int T_TEST_SERVIDOR = 120;
 unsigned int T_ABIERTA_SIN_ESPERAR = 60;
-unsigned int T_ABIERTA_LIBRE_ESPERAR = 3;
+unsigned int T_ABIERTA_LIBRE_ESPERAR = 1;
 unsigned int T_REINTENTA_SIN_FC = 10;
 unsigned int T_REINTENTA_CON_FC = 10;
 
