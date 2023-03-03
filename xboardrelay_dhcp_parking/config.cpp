@@ -17,8 +17,8 @@ const char* REQUEST_QUERY = "/parker/barrera_alive/";
 unsigned int T_TEST_SERVIDOR = 120;
 unsigned int T_ABIERTA_SIN_ESPERAR = 60;
 unsigned int T_ABIERTA_LIBRE_ESPERAR = 1;
-unsigned int T_REINTENTA_SIN_FC = 10;
-unsigned int T_REINTENTA_CON_FC = 10;
+unsigned int T_REINTENTA_SIN_FC = 5;
+unsigned int T_REINTENTA_CON_FC = 5;
 
 #define ADDR_TEST_SERVIDOR 0
 #define ADDR_ABIERTA_SIN_ESPERAR ADDR_TEST_SERVIDOR + EEPROMTyped.sizeOf(T_TEST_SERVIDOR)
