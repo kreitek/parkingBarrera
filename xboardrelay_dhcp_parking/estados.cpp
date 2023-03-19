@@ -84,6 +84,17 @@ void estado_loop() {
         estado_siguiente(ABIERTA);
       else if (final_carrera_cerrada())
         estado_siguiente(ABRIENDO_PULSO);
+      else if (obstaculo())
+        estado_siguiente(ABRIENDO_OCUPADA);
+      else if (T_REINTENTA_CON_FC && tiempo_en_estado() > T_REINTENTA_CON_FC)
+        estado_siguiente(ABRIENDO_PULSO);
+      break;
+
+    case ABRIENDO_OCUPADA:
+      if (final_carrera_abierta())
+        estado_siguiente(ABIERTA_OCUPADA);
+      else if (final_carrera_cerrada())
+        estado_siguiente(ABRIENDO_PULSO);
       else if (T_REINTENTA_CON_FC && tiempo_en_estado() > T_REINTENTA_CON_FC)
         estado_siguiente(ABRIENDO_PULSO);
       break;
@@ -138,6 +149,7 @@ const __FlashStringHelper* EstadoStr() {
         case CERRADA:                return F("Cerrada");
         case ABRIENDO_PULSO:    	 return F("Pulso apertura");
         case ABRIENDO:    			 return F("Abriendo");
+        case ABRIENDO_OCUPADA:    	 return F("Abriendo ocupada");
         case ABIERTA:                return F("Abierta");
         case ABIERTA_OCUPADA:        return F("Abierta ocupada");
         case ABIERTA_LIBRE:          return F("Abierta libre");
