@@ -3,8 +3,12 @@
 
 // esto es lo que hay que cambiar por cada cosa
 
+byte MAC[6] = {0xDE, 0xAD, 0xBE, 0xEF, 0xEE, 0x34};
+const char* HOSTNAME = "p3ex"; 
+/*
 byte MAC[6] = {0xDE, 0xAD, 0xBE, 0xEF, 0xEE, 0x39};
 const char* HOSTNAME = "p3sx"; 
+*/
 const char* PASSWORD = "maker";
 const char* REQUEST_HOST = "192.168.3.2";   // numeric IP (no DNS)
 
@@ -28,11 +32,11 @@ unsigned int T_REINTENTA_CON_FC = 5;
 #define ADDR_FIN ADDR_REINTENTA_CON_FC + EEPROMTyped.sizeOf(T_REINTENTA_CON_FC)
 
 void config_default() {
-	T_TEST_SERVIDOR = 30;
+	T_TEST_SERVIDOR = 120;
 	T_ABIERTA_SIN_ESPERAR = 60;
-	T_ABIERTA_LIBRE_ESPERAR = 3;
-	T_REINTENTA_SIN_FC = 10;
-	T_REINTENTA_CON_FC = 10;
+	T_ABIERTA_LIBRE_ESPERAR = 1;
+	T_REINTENTA_SIN_FC = 5;
+	T_REINTENTA_CON_FC = 5;
 }
 
 void config_read() {
