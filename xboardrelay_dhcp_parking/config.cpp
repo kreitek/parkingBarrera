@@ -19,9 +19,9 @@ const int PORT = 80;
 const char* FOLDER = "/api/";
 const char* REQUEST_QUERY = "/parker/barrera_alive/";
 unsigned int T_TEST_SERVIDOR = 120;
-unsigned int T_ABIERTA_SIN_ESPERAR = 60;
+unsigned int T_ABIERTA_SIN_ESPERAR = 10;
 unsigned int T_ABIERTA_LIBRE_ESPERAR = 1;
-unsigned int T_REINTENTA_SIN_FC = 5;
+unsigned int T_REINTENTA_SIN_FC = 8;
 unsigned int T_REINTENTA_CON_FC = 5;
 
 #define ADDR_TEST_SERVIDOR 0
@@ -33,9 +33,9 @@ unsigned int T_REINTENTA_CON_FC = 5;
 
 void config_default() {
 	T_TEST_SERVIDOR = 120;
-	T_ABIERTA_SIN_ESPERAR = 60;
+	T_ABIERTA_SIN_ESPERAR = 10;
 	T_ABIERTA_LIBRE_ESPERAR = 1;
-	T_REINTENTA_SIN_FC = 5;
+	T_REINTENTA_SIN_FC = 8;
 	T_REINTENTA_CON_FC = 5;
 }
 
