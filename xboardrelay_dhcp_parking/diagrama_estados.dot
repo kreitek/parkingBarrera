@@ -18,30 +18,33 @@ digraph G {
     }
 
     boton_cerrar -> cerrando_pulso
-    "boton_abrir auto" -> abriendo_pulso [label="no fca"]
+    "boton_abrir auto" -> abriendo_pulso [label="!fca"]
     "boton_abrir auto" -> abierta [label="fca"]
-    "boton_abrir !auto" -> abriendo_pulso [label="no fca"]
+    "boton_abrir !auto" -> abriendo_pulso [label="!fca"]
     "boton_abrir !auto" -> abierta [label="fca"]
 
     "inicial auto" -> cerrada [label="fcc"]
     "inicial auto" -> abierta [label="fca"]
-    "inicial auto" -> cerrando_pulso [label="ni fcc ni fca"]
-    abriendo_pulso -> abriendo [label="ni fcc ni fca"]
+    "inicial auto" -> cerrando_pulso [label="!fcc & !fca"]
+
+    /* seguir el orden del switch-case en estados.cpp */
+
+    abriendo_pulso -> abriendo [label="!fcc && !fca"]
+    abriendo_pulso -> abriendo_pulso [label="trsf"]
     abriendo -> abierta [label="fca"]
     abriendo -> abriendo_pulso [label="fcc"]
-    abriendo_pulso -> abriendo_pulso [label="t3"]
-    abriendo -> abriendo_pulso [label="t4"]
+    abriendo -> abriendo_pulso [label="trcf"]
     abierta -> abierta_ocupada [label="auto & obstaculo"]
+    abierta -> cerrando_pulso [label="auto & tase"]
     abierta_ocupada -> abierta [label="!auto & !obstaculo"]
-    abierta -> cerrando_pulso [label="auto & t2"]
     abierta_ocupada -> abierta_libre [label="auto & !obstaculo"]
     abierta_libre -> abierta_ocupada [label="obstaculo"]
-    abierta_libre -> cerrando_pulso [label="t1"]
-    cerrando_pulso -> cerrando_pulso [label="t3"]
-    cerrando -> cerrando_pulso [label="t4"]
-    cerrando_pulso -> cerrando [label="ni fcc ni fca"]
+    abierta_libre -> cerrando_pulso [label="tale"]
+    cerrando_pulso -> cerrando [label="!fca & !fcc"]
+    cerrando_pulso -> cerrando_pulso [label="trsf"]
     cerrando -> cerrada [label="fcc"]
-    cerrando -> abierta_ocupada [label="fca"]
+    cerrando -> cerrando_pulso [label="fca"]
+    cerrando -> cerrando_pulso [label="trcf"]
 
 	"toggle=0" -> "toggle=1"
 }
