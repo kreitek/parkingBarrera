@@ -1,6 +1,8 @@
 #include <Arduino.h>
 #include <Ethernet.h>
 
+// #define CON_TIMBRE  // es el A0
+
 extern byte MAC[6];
 extern byte IP[4];
 extern const char* HOSTNAME;

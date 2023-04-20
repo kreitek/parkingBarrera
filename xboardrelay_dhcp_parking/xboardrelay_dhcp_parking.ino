@@ -8,10 +8,10 @@
 
 
 #include <Bounce2.h>
+#include "config.h"
 #include "estados.h"
 #include "hardware.h"
 #include "web.h"
-#include "config.h"
 #include <avr/wdt.h>
 #include <Ethernet.h>
 
@@ -97,7 +97,11 @@ void loop() {
   // cosas que hay que ejecutar a cada iteracion
   hardware_loop(); // para renovar los bounces
   ethernet_loop(); // para renovar el dhcp lease cuando toque
+#ifdef CON_TIMBRE
+  timbre_loop(client);
+#else
   estado_loop(); // para chequear sensores y ejecutar maquina de estados
+#endif
 
   wdtLoop();
   if (esta_cerrada() && !hayConexion(client)){

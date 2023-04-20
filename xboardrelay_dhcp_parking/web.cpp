@@ -1,8 +1,8 @@
 #include <Arduino.h>
+#include "config.h"
 #include "web.h"
 #include "estados.h"
 #include "hardware.h"
-#include "config.h"
 
 uHTTP server = uHTTP(PORT);
 
@@ -55,6 +55,7 @@ void webpage_form(EthernetClient &client) {
 
   client.print(F("<ul>"));
 
+#ifndef CON_TIMBRE
   client.print(F("<li>Estado: "));
   client.print(EstadoStr());
   client.print(F(" hace "));
@@ -70,6 +71,7 @@ void webpage_form(EthernetClient &client) {
   client.print(F(" hace "));
   web_time(client, ultima_orden_millis);
   client.print(F("</li>"));
+#endif
 
   client.print(F("<li>Uptime: "));
   web_time(client, 0);
@@ -84,6 +86,17 @@ void webpage_form(EthernetClient &client) {
 
   client.print(F("</ul>"));
 
+#ifdef CON_TIMBRE
+  client.print(F("<h2>Inputs</h2>"));
+
+  client.print(F("<ul>"));
+
+  client.print(F("<li>A0 Boton timbre: "));
+  client.print(boton_abrir_automatico());
+  client.print(F("</li>"));
+  client.print(F("</ul>"));
+
+#else
   client.print(F("<h2>Config</h2>"));
   client.print(F("<ul>"));
   client.print(F("<li>T test servidor: "));
@@ -152,6 +165,7 @@ void webpage_form(EthernetClient &client) {
     "</div>" \
     "<div>Password <input type=password name=key></div>" \
     "</form>"));
+#endif
 
   client.print(F("</html>"));
   client.stop();

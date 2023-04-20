@@ -24,6 +24,10 @@ void estado_siguiente(Estado siguiente);
 bool esta_cerrada();
 const __FlashStringHelper* EstadoStr();
 const __FlashStringHelper* OrdenStr();
+#ifdef CON_TIMBRE
+#include <Ethernet.h>
+void timbre_loop(EthernetClient &client);
+#endif
 
 extern long unsigned int estado_millis;
 extern long unsigned int ultima_orden_millis;

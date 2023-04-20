@@ -169,4 +169,38 @@ const __FlashStringHelper* OrdenStr() {
     }
 }
 
+#ifdef CON_TIMBRE
+
+bool timbre_web(EthernetClient &client){
+  // close any connection before send a new request.
+  // This will free the socket on the WiFi shield
+  client.stop();
+  if (Serial) Serial.println("connecting timbre");
+  if (client.connect(REQUEST_HOST, 80)) {
+    // send the HTTP GET request:
+    client.print("GET /parker/timbre/"); 
+	for(unsigned int i=0; i<6; i++) {
+		client.print(MAC[i]/16, HEX);
+		client.print(MAC[i]%16, HEX);
+    }
+	client.print("&t="); client.print(millis()/1000); 
+    client.println(" HTTP/1.1");
+    client.print("Host: "); client.println(REQUEST_HOST);
+    client.println("User-Agent: arduino-ethernet");
+    client.println("Connection: close");
+    client.println();
+    client.stop();
+  }
+}
+
+void timbre_loop(EthernetClient &client) {
+	if (trigger_abrir_automatico()) {
+        if (boton_abrir_automatico()) {
+            Serial.println("Timbre!");
+            timbre_web(client);
+        }
+	}
+}
+#endif
+
 // vim: ai:expandtab:ts=2:sw=2
